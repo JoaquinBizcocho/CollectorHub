@@ -1,0 +1,38 @@
+/* src/index.css */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* VARIABLES GLOBALES (Modo Claro por defecto) */
+:root {
+  --bg-global: #e0ffe2;
+  --bg-tarjeta: #f8f8f8;
+  --texto-principal: #2d4a3e;
+  --borde-input: #a5d6a7;
+  --bg-input: #ffffff;
+  --texto-input: #2d4a3e;
+  --sombra: rgba(0, 0, 0, 0.6);
+}
+
+/* VARIABLES MODO OSCURO */
+[data-theme="dark"] {
+  --bg-global: #111111;
+  --bg-tarjeta: #262727;
+  --texto-principal: #e8f5e9;
+  --borde-input: #4caf50;
+  --bg-input: #464646;
+  --texto-input: #ffffff;
+  --sombra: rgba(113, 173, 131, 0.4);
+}
+
+html, body, #root {
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-global); /* Usa la variable */
+  overflow: hidden;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  transition: background-color 0.3s ease; /* Transición suave al cambiar de modo */
+}

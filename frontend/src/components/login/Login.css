@@ -1,0 +1,164 @@
+/**
+ * Hoja de estilos del componente Login.
+ * Gestiona el diseño modular de la tarjeta de acceso, el posicionamiento 
+ * de los elementos internos y la integración con el sistema de temas (Dark/Light Mode).
+ */
+
+/* src/components/Login/Login.css */
+
+/**
+ * Contenedor principal de la tarjeta de inicio de sesión.
+ * Utiliza 'position: relative' para actuar como ancla de los elementos con 'position: absolute' (como los botones de tema y contraseña).
+ * Consume variables CSS (--bg-tarjeta, --sombra) para reaccionar a los cambios de tema.
+ */
+.login-card {
+  position: relative; /* Crucial para posicionar el botón de la luna/sol */
+  background: var(--bg-tarjeta);
+  padding: 4rem; 
+  border-radius: 25px;
+  box-shadow: 0 15px 40px var(--sombra);
+  width: 500px;
+  text-align: center;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+/**
+ * Botón para alternar el tema visual (Claro/Oscuro).
+ * Se posiciona flotando en la esquina superior derecha del contenedor padre (.login-card).
+ */
+.btn-theme-mini {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+  opacity: 0.7;
+}
+
+.btn-theme-mini:hover {
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+/**
+ * Titular principal (Brand/Logo) de la tarjeta de acceso.
+ */
+.login-card h1 {
+  color: #66bb6a;
+  margin-bottom: 2.5rem;
+  font-size: 2.8rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+/**
+ * Agrupador estructural para los campos del formulario.
+ * Mantiene la separación vertical y sirve de ancla para los iconos internos del input.
+ */
+.input-group {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+/**
+ * Estilos base para los campos de texto interactivos (Alias y Contraseña).
+ * Diseñados para adaptarse dinámicamente inyectando las variables de tema global.
+ */
+.input-group input {
+  width: 100%;
+  padding: 18px;
+  font-size: 1.1rem;
+  border: 2px solid var(--borde-input);
+  background-color: var(--bg-input);
+  color: var(--texto-input);
+  border-radius: 12px;
+  box-sizing: border-box;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.input-group input::placeholder {
+  color: #9e9e9e;
+}
+
+/**
+ * Estado de enfoque (focus) para mejorar la accesibilidad visual al escribir.
+ */
+.input-group input:focus {
+  border-color: #66bb6a;
+  box-shadow: 0 0 10px rgba(102, 187, 106, 0.15);
+}
+
+/**
+ * Botón de "Mostrar/Ocultar" contraseña.
+ * Posicionado a la derecha dentro de su contenedor relativo (.input-group).
+ */
+.btn-toggle {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.6rem;
+  color: #757575;
+  transition: color 0.3s;
+}
+
+.btn-toggle:hover {
+  color: #66bb6a;
+}
+
+/**
+ * Botón principal de envío (Submit) del formulario.
+ */
+.login-button {
+  width: 100%;
+  padding: 18px;
+  font-size: 1.2rem;
+  background-color: #66bb6a;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s, box-shadow 0.3s;
+  margin-top: 1rem;
+}
+
+.login-button:hover {
+  background-color: #4caf50;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+/**
+ * Contenedor para mostrar el feedback del servidor (respuestas de la API).
+ * Utiliza bordes y colores suaves para no romper la estética principal.
+ */
+.mensaje-alerta {
+  margin-top: 2rem;
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #f1f8f3; 
+  color: #2d4a3e;
+  font-weight: 600;
+  font-size: 1rem;
+  border-left: 6px solid #66bb6a;
+  text-align: left;
+}
+
+/**
+ * Sobrescitura específica de estilos cuando el DOM tiene activo el modo oscuro.
+ * Modifica la alerta para que mantenga un alto contraste sin deslumbrar.
+ */
+/* Ajuste específico de la alerta para el modo oscuro */
+[data-theme="dark"] .mensaje-alerta {
+  background-color: #1e3325;
+  color: #e8f5e9;
+}
