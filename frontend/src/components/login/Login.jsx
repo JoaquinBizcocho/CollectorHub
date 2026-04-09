@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './Login.css';
 
-const Login = ({ alIrARegistro }) => {
+const Login = ({ alIrARegistro, alLoginExitoso }) => {
   const [alias, setAlias] = useState('');
   const [password, setPassword] = useState('');
   const [mostrarPass, setMostrarPass] = useState(false);
@@ -17,19 +17,31 @@ const Login = ({ alIrARegistro }) => {
   }, [isDarkMode]);
 
   const manejarLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const respuesta = await fetch('http://localhost:8080/api/login', {
+  e.preventDefault();
+  try {
+    const respuesta = await fetch('http://localhost:8080/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ alias, password })
       });
-      const texto = await respuesta.text();
-      setMensaje(texto);
-    } catch (error) {
-      setMensaje("❌ Error crítico de conexión con el Backend");
-    }
-  };
+      
+      // Ahora recibimos un JSON del backend, no un texto suelto
+      const data = await respuesta.json(); 
+      setMensaje(data.mensaje);
+
+      if (respuesta.ok && data.mensaje.includes('✅')) {
+        localStorage.setItem('collectorhub-usuario-id', data.usuarioId);
+        // ¡NUEVO! Guardamos el alias para mostrarlo luego
+        localStorage.setItem('collectorhub-usuario-alias', alias); 
+        
+        setTimeout(() => {
+          alLoginExitoso();
+        }, 1000);
+      }
+  } catch (error) {
+    setMensaje("Error crítico de conexión con el Backend");
+  }
+};
 
   return (
     <div className="login-card">

@@ -3,9 +3,11 @@ package com.collectorhub.backend.Controller;
 import com.collectorhub.backend.Repository.UsuarioRepository;
 import com.collectorhub.backend.Entidades.Usuario; // Asegúrate de que esta ruta coincida con tu clase Usuario
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -18,47 +20,52 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class LoginController {
 
-    /**
-     * Inyección de dependencias del repositorio de usuarios.
-     * Permite realizar consultas a la base de datos MySQL (JPA).
-     */
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    /**
-     * Inyección de la herramienta de cifrado de contraseñas (BCrypt).
-     * Se configura en SecurityConfig.java.
-     */
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     /**
      * Procesa las peticiones HTTP POST enviadas a la ruta "/api/login".
-     * Extrae las credenciales del cuerpo de la petición (JSON) y las verifica
-     * de forma dinámica contra los registros de la base de datos.
+     * Extrae las credenciales y las verifica devolviendo un JSON (Map)
+     * con el mensaje y el ID del usuario si el acceso es correcto.
      */
     @PostMapping("/login")
-    public String login(@RequestBody Map<String, String> credenciales) {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> credenciales) {
         String alias = credenciales.get("alias");
         String pass = credenciales.get("password");
 
-        // BÚSQUEDA REAL EN LA BASE DE DATOS
         return usuarioRepository.findByAlias(alias)
                 .map(user -> {
-                    // OJO: Como ahora vamos a cifrar las contraseñas, en el futuro aquí usaremos passwordEncoder.matches()
-                    // Pero por ahora lo dejamos así para no romper los usuarios de prueba del init.sql
-                    if (user.getPassword().equals(pass)) {
-                        return "¡Acceso concedido! Bienvenido " + user.getAlias();
+                    System.out.println("Usuario encontrado en BD: " + user.getAlias());
+                    System.out.println("Hash guardado en BD: " + user.getPassword());
+                    System.out.println("Longitud del Hash: " + user.getPassword().length() + " (debería ser 60)");
+
+                    if (passwordEncoder.matches(pass, user.getPassword())) {
+                        System.out.println("Resultado: ✅ COINCIDEN");
+                        Map<String, Object> respuesta = new HashMap<>();
+                        respuesta.put("mensaje", "✅ Acceso concedido");
+                        respuesta.put("usuarioId", user.getId());
+                        return ResponseEntity.ok(respuesta);
+                    } else {
+                        System.out.println("Resultado: ❌ NO COINCIDEN");
+                        Map<String, String> error = new HashMap<>();
+                        error.put("mensaje", "❌ Contraseña incorrecta.");
+                        return ResponseEntity.badRequest().body(error);
                     }
-                    return "Contraseña incorrecta.";
                 })
-                .orElse("El usuario no existe en la base de datos.");
+                .orElseGet(() -> {
+                    System.out.println("Resultado: ❌ USUARIO NO ENCONTRADO");
+                    Map<String, String> error = new HashMap<>();
+                    error.put("mensaje", "❌ El usuario no existe en la base de datos.");
+                    return ResponseEntity.badRequest().body(error);
+                });
     }
 
     /**
      * Procesa las peticiones HTTP POST enviadas a la ruta "/api/register".
-     * Crea un nuevo usuario validando que el alias y el correo no existan previamente,
-     * y cifra la contraseña antes de guardarla en la base de datos.
+     * Crea un nuevo usuario validando que el alias y el correo no existan previamente.
      */
     @PostMapping("/register")
     public String registrarUsuario(@RequestBody Map<String, String> datosUsuario) {
@@ -68,17 +75,17 @@ public class LoginController {
 
         // 1. Comprobar que no faltan datos
         if (alias == null || correo == null || passPlana == null) {
-            return "Error: Faltan datos obligatorios.";
+            return "❌ Error: Faltan datos obligatorios.";
         }
 
-        // 2. Comprobar que el alias no existe (usando el radar que pusimos en el Repository)
+        // 2. Comprobar que el alias no existe
         if (usuarioRepository.existsByAlias(alias)) {
-            return "Error: El alias ya está en uso. Elige otro.";
+            return "❌ Error: El alias ya está en uso. Elige otro.";
         }
 
         // 3. Comprobar que el correo no existe
         if (usuarioRepository.comprobarSiExisteCorreo(correo)) {
-            return "Error: Ya existe una cuenta con este correo electrónico.";
+            return "❌ Error: Ya existe una cuenta con este correo electrónico.";
         }
 
         // 4. Encriptar la contraseña
@@ -89,10 +96,10 @@ public class LoginController {
         nuevoUsuario.setAlias(alias);
         nuevoUsuario.setCorreo_electronico(correo);
         nuevoUsuario.setPassword(passEncriptada);
-        nuevoUsuario.setRol("user"); // Por defecto, todo el que se registra es un usuario normal
+        nuevoUsuario.setRol("user");
 
         usuarioRepository.save(nuevoUsuario);
 
-        return "¡Usuario registrado con éxito! Ya puedes iniciar sesión.";
+        return "✅ ¡Usuario registrado con éxito! Ya puedes iniciar sesión.";
     }
 }
