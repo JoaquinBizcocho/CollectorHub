@@ -20,38 +20,39 @@ const Login = ({ alIrARegistro, alLoginExitoso }) => {
   e.preventDefault();
   try {
     const respuesta = await fetch('http://localhost:8080/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ alias, password })
-      });
-      
-      // Ahora recibimos un JSON del backend, no un texto suelto
-      const data = await respuesta.json(); 
-      setMensaje(data.mensaje);
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ alias, password })
+    });
 
-      if (respuesta.ok && data.mensaje.includes('✅')) {
-        localStorage.setItem('collectorhub-usuario-id', data.usuarioId);
-        // ¡NUEVO! Guardamos el alias para mostrarlo luego
-        localStorage.setItem('collectorhub-usuario-alias', alias); 
-        
-        setTimeout(() => {
-          alLoginExitoso();
-        }, 1000);
-      }
+    const data = await respuesta.json();
+    setMensaje(data.mensaje);
+
+    // Comprobamos que la respuesta es correcta y que el servidor nos ha enviado un ID de usuario
+    if (respuesta.ok && data.usuarioId) {
+      localStorage.setItem('collectorhub-usuario-id', data.usuarioId);
+      localStorage.setItem('collectorhub-usuario-alias', alias);
+      localStorage.setItem('collectorhub-rol', data.rol);
+
+      // Esperamos un segundo para que el usuario pueda leer el mensaje de exito
+      setTimeout(() => {
+        alLoginExitoso();
+      }, 1000);
+    }
   } catch (error) {
-    setMensaje("Error crítico de conexión con el Backend");
+    setMensaje("Error critico de conexion con el servidor");
   }
 };
 
   return (
     <div className="login-card">
-      <button 
+      {/* <button 
         className="login-theme-btn"
         onClick={() => setIsDarkMode(!isDarkMode)}
         title="Cambiar tema"
       >
         {isDarkMode ? '☀️' : '🌙'}
-      </button>
+      </button> */}
 
       <h1 className="login-title">CollectorHub</h1>
       

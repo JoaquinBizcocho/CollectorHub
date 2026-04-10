@@ -6,7 +6,7 @@
   box-sizing: border-box;
 }
 
-/* VARIABLES GLOBALES (Modo Claro por defecto) */
+/* VARIABLES GLOBALES  */
 :root {
   --bg-global: #e0ffe2;
   --bg-tarjeta: #f8f8f8;

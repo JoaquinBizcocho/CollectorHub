@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Entity
 @Table(name = "usuarios")
-@Data // Esto de Lombok crea los Getters y Setters automáticamente
+@Data
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

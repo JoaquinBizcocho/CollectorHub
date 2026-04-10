@@ -16,12 +16,12 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Le decimos a Spring que por ahora no bloquee ninguna ruta (ya lo haremos más adelante)
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Desactiva la protección CSRF para poder probar desde React/Postman
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()); // Permite todo
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
         return http.build();
     }
 }

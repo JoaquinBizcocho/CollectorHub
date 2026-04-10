@@ -35,7 +35,7 @@ const Register = ({ alIrALogin }) => {
         setPassword('');
       }
     } catch (error) {
-      setMensaje("❌ Error crítico de conexión con el Backend");
+      setMensaje("Error crítico de conexión con el Backend");
     }
   };
 

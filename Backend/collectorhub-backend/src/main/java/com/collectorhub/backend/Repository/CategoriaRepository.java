@@ -8,4 +8,7 @@ import java.util.List;
 @Repository
 public interface CategoriaRepository extends JpaRepository<Categoria, Integer> {
     List<Categoria> findByUsuarioId(Integer usuarioId);
+
+    // Para buscar las plantillas oficiales del Admin
+    List<Categoria> findByEsOficialTrue();
 }
