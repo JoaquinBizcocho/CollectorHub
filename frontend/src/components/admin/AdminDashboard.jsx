@@ -18,19 +18,39 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
 
   const cargarEstadisticas = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/admin/estadisticas');
+      // 1. Sacamos la "pulsera VIP" del almacenamiento
+      const token = localStorage.getItem('collectorhub-token');
+
+      // 2. Hacemos el fetch añadiendo las cabeceras (headers)
+      const response = await fetch('http://localhost:8080/api/admin/estadisticas', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token // ¡Aquí enseñamos el pase!
+        }
+      });
+
       if (response.ok) {
         const data = await response.json();
         setEstadisticas(data);
+      } else {
+        console.error("Acceso denegado. El token podría estar caducado o no eres admin.");
       }
     } catch (error) {
       console.error("Error al cargar estadisticas", error);
     }
-  };
+  }
 
   const cargarPlantillas = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/categorias/oficiales');
+      const token = localStorage.getItem('collectorhub-token');
+
+      const response = await fetch('http://localhost:8080/api/categorias/oficiales', {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setPlantillas(data);
@@ -54,7 +74,14 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
 
   const borrarPlantilla = async (id) => {
     if (window.confirm("¿Borrar esta plantilla oficial?")) {
-      await fetch(`http://localhost:8080/api/categorias/${id}`, { method: 'DELETE' });
+      const token = localStorage.getItem('collectorhub-token');
+
+      await fetch(`http://localhost:8080/api/categorias/${id}`, { 
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      });
       cargarPlantillas();
     }
   };
@@ -72,9 +99,14 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
     };
 
     try {
+      const token = localStorage.getItem('collectorhub-token');
+
       const response = await fetch('http://localhost:8080/api/categorias', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
         body: JSON.stringify(nuevaPlantilla)
       });
 

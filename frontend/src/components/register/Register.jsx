@@ -41,13 +41,13 @@ const Register = ({ alIrALogin }) => {
 
   return (
     <div className="register-card">
-      <button 
+      {/* <button 
         className="register-theme-btn"
         onClick={() => setIsDarkMode(!isDarkMode)}
         title="Cambiar tema"
       >
         {isDarkMode ? '☀️' : '🌙'}
-      </button>
+      </button> */}
 
       <h1 className="register-title">Crear Cuenta</h1>
       <p className="register-subtitle">Únete a CollectorHub</p>

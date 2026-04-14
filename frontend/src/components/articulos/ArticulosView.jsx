@@ -2,15 +2,12 @@ import { useState, useEffect } from 'react';
 import '../categorias/Categorias.css';
 
 // --- MINI-COMPONENTE PARA EL CARRUSEL DE LA TARJETA ---
-// Esto hace que la imagen cambie sola cada 5 segundos sin ralentizar el resto de la pagina
 const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
   const [indice, setIndice] = useState(0);
   
-  // Filtramos para quedarnos solo con las imagenes que de verdad existan
   const imagenesValidas = [imagen1, imagen2].filter(img => img !== null && img !== "");
 
   useEffect(() => {
-    // Si hay mas de 1 imagen, activamos el temporizador de 5 segundos 
     if (imagenesValidas.length > 1) {
       const temporizador = setInterval(() => {
         setIndice(prev => (prev + 1) % imagenesValidas.length);
@@ -26,7 +23,6 @@ const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
 
   return (
     <img 
-      // Usamos el indice para saber que foto toca mostrar
       src={imagenesValidas[indice]} 
       alt="Articulo" 
       className="articulo-imagen-preview clickable animacion-fade" 
@@ -44,7 +40,6 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
   const [datosFormulario, setDatosFormulario] = useState({});
   const [imagenes, setImagenes] = useState([]); 
 
-  // --- ESTADO MEJORADO PARA EL LIGHTBOX ---
   const [lightbox, setLightbox] = useState({ 
     activo: false, 
     listaImagenes: [], 
@@ -59,7 +54,13 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
 
   const cargarArticulos = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/articulos/categoria/${categoria.id}/usuario/${usuarioId}`);
+      const token = localStorage.getItem('collectorhub-token'); // Sacamos token
+      const response = await fetch(`http://localhost:8080/api/articulos/categoria/${categoria.id}/usuario/${usuarioId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token // Enseñamos pase
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setArticulos(data);
@@ -69,7 +70,6 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     }
   };
 
-  // --- CONTROLADORES DEL LIGHTBOX ---
   const abrirLightbox = (imagenesLista, indexClicado) => {
     setLightbox({
       activo: true,
@@ -98,7 +98,6 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     }));
   };
 
-  // --- CONTROLADORES DEL FORMULARIO ---
   const manejarCambioInput = (nombreCampo, valor) => {
     setDatosFormulario({ ...datosFormulario, [nombreCampo]: valor });
   };
@@ -141,7 +140,13 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
 
   const borrarArticulo = async (id) => {
     if (window.confirm("Estas seguro de que quieres borrar este articulo?")) {
-      await fetch(`http://localhost:8080/api/articulos/${id}`, { method: 'DELETE' });
+      const token = localStorage.getItem('collectorhub-token'); 
+      await fetch(`http://localhost:8080/api/articulos/${id}`, { 
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + token 
+        }
+      });
       cargarArticulos();
     }
   };
@@ -155,22 +160,32 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
       imagen1: imagenes[0] || null,
       imagen2: imagenes[1] || null
     };
+    
     const metodo = idEditando ? 'PUT' : 'POST';
     const url = idEditando ? `http://localhost:8080/api/articulos/${idEditando}` : 'http://localhost:8080/api/articulos';
+    
     try {
+      const token = localStorage.getItem('collectorhub-token');
+
       const response = await fetch(url, {
-        method: metodo,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(articuloGuardar)
+        method: metodo, 
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token 
+        },
+        body: JSON.stringify(articuloGuardar) 
       });
+
       if (response.ok) {
-        cargarArticulos();
+        cargarArticulos(); 
         setMostrarModal(false);
+      } else {
+        console.error("El servidor rechazó la petición. Revisa el token.");
       }
     } catch (error) {
       console.error("Error al guardar", error);
     }
-  };
+  }
 
   return (
     <div className="dashboard-wrapper">
@@ -200,7 +215,6 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
             articulos.map((art) => (
               <div key={art.id} className="articulo-card">
                 <div className="articulo-imagen-container">
-                  {/* --- USAMOS EL NUEVO COMPONENTE AQUI --- */}
                   <CarruselMiniatura 
                     imagen1={art.imagen1} 
                     imagen2={art.imagen2} 
@@ -213,7 +227,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                     <div key={idx} className="articulo-dato">
                       <span className="dato-etiqueta">{campo.nombre}: </span>
                       <span className="dato-valor">
-                        {art.datos && art.datos[campo.nombre] 
+                        {art.datos && art.datos[campo.nombre] !== undefined && art.datos[campo.nombre] !== null && art.datos[campo.nombre] !== ''
                           ? (campo.tipo === 'boolean' ? (art.datos[campo.nombre] ? 'Si' : 'No') : art.datos[campo.nombre]) 
                           : '-'}
                       </span>
@@ -240,7 +254,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                     <div key={index} className="campo-dinamico">
                       <label>{campo.nombre}</label>
                       {campo.tipo === 'boolean' ? (
-                        <select className="input-base" value={datosFormulario[campo.nombre] || ''} onChange={(e) => manejarCambioInput(campo.nombre, e.target.value === 'true')}>
+                        <select className="input-base" value={datosFormulario[campo.nombre] !== undefined ? datosFormulario[campo.nombre] : ''} onChange={(e) => manejarCambioInput(campo.nombre, e.target.value === 'true' ? true : e.target.value === 'false' ? false : '')}>
                           <option value="">Selecciona...</option>
                           <option value="true">Si</option>
                           <option value="false">No</option>
@@ -285,7 +299,6 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                 </button>
               )}
 
-              {/* La key hace que React fuerce una animacion al cambiar de foto */}
               <img 
                 key={lightbox.indiceActual}
                 src={lightbox.listaImagenes[lightbox.indiceActual]} 

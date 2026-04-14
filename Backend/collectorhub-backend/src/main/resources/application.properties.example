@@ -1,11 +1,10 @@
-# URL real de Railway
+# PLANTILLA PARA GITHUB
 spring.datasource.url=jdbc:mysql://maglev.proxy.rlwy.net:10845/railway?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&allowLoadLocalInfile=true
 
-
-spring.datasource.username=${DB_USER}
-spring.datasource.password=${DB_PASSWORD}
+# Para que funcione, debes configurar estas variables de entorno en tu IDE:
+spring.datasource.username=PON_EL_USUARIO_AQUI
+spring.datasource.password=PON_LA_CONTRASEÑA_AQUI
 
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
 spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true

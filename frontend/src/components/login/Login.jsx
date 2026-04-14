@@ -16,7 +16,7 @@ const Login = ({ alIrARegistro, alLoginExitoso }) => {
     localStorage.setItem('collectorhub-tema', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
-  const manejarLogin = async (e) => {
+const manejarLogin = async (e) => {
   e.preventDefault();
   try {
     const respuesta = await fetch('http://localhost:8080/api/login', {
@@ -28,11 +28,14 @@ const Login = ({ alIrARegistro, alLoginExitoso }) => {
     const data = await respuesta.json();
     setMensaje(data.mensaje);
 
-    // Comprobamos que la respuesta es correcta y que el servidor nos ha enviado un ID de usuario
+    // Comprobamos que la respuesta es correcta
     if (respuesta.ok && data.usuarioId) {
       localStorage.setItem('collectorhub-usuario-id', data.usuarioId);
       localStorage.setItem('collectorhub-usuario-alias', alias);
       localStorage.setItem('collectorhub-rol', data.rol);
+      
+      // Guardamos la "pulsera VIP" (el token) en el bolsillo del navegador
+      localStorage.setItem('collectorhub-token', data.token);
 
       // Esperamos un segundo para que el usuario pueda leer el mensaje de exito
       setTimeout(() => {

@@ -23,8 +23,15 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
 
   const cargarCategorias = async () => {
     const usuarioId = localStorage.getItem('collectorhub-usuario-id');
+    const token = localStorage.getItem('collectorhub-token'); // 1. Sacamos el token
+
     try {
-      const response = await fetch(`http://localhost:8080/api/categorias/usuario/${usuarioId}`);
+      const response = await fetch(`http://localhost:8080/api/categorias/usuario/${usuarioId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token // 2. ¡Lo enviamos!
+        }
+      });
       if (response.ok) {
         setCategorias(await response.json());
       }
@@ -34,8 +41,15 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   };
 
   const cargarPlantillas = async () => {
+    const token = localStorage.getItem('collectorhub-token'); // 1. Sacamos el token
+
     try {
-      const response = await fetch('http://localhost:8080/api/categorias/oficiales');
+      const response = await fetch('http://localhost:8080/api/categorias/oficiales', {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token // 2. ¡Lo enviamos!
+        }
+      });
       if (response.ok) {
         setPlantillas(await response.json());
       }
@@ -51,7 +65,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
     setNombre('');
     setDescripcion('');
     setEsquema([{ nombre: '', tipo: 'text' }]);
-    setPasoModal(1); // Abrimos el menu de los dos botones grandes
+    setPasoModal(1);
   };
 
   const abrirEdicion = (cat) => {
@@ -59,7 +73,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
     setNombre(cat.nombre);
     setDescripcion(cat.descripcion);
     setEsquema(cat.esquema || []);
-    setPasoModal(2); // Al editar vamos directo al formulario normal
+    setPasoModal(2);
   };
 
   const cerrarModal = () => {
@@ -70,8 +84,15 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
 
   const borrarCategoria = async (id) => {
     if (window.confirm("¿Estas seguro? Se borraran todos los objetos de esta categoria para siempre.")) {
+      const token = localStorage.getItem('collectorhub-token'); // 1. Sacamos el token
+
       try {
-        const response = await fetch(`http://localhost:8080/api/categorias/${id}`, { method: 'DELETE' });
+        const response = await fetch(`http://localhost:8080/api/categorias/${id}`, { 
+          method: 'DELETE',
+          headers: {
+            'Authorization': 'Bearer ' + token // 2. ¡Lo enviamos!
+          }
+        });
         if (response.ok) cargarCategorias();
       } catch (error) {
         console.error("Error al borrar la categoria", error);
@@ -82,25 +103,31 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   const crearDesdePlantilla = async (plantilla) => {
     const usuarioId = localStorage.getItem('collectorhub-usuario-id');
     
-    // Creamos un objeto nuevo clonando los datos de la plantilla, pero para este usuario
     const nuevaCategoria = {
       nombre: plantilla.nombre,
       descripcion: plantilla.descripcion,
       esquema: plantilla.esquema || [],
       usuarioId: parseInt(usuarioId),
-      esOficial: false // Es una copia privada para el usuario, no una plantilla global
+      esOficial: false
     };
 
     try {
+      const token = localStorage.getItem('collectorhub-token');
+
       const response = await fetch('http://localhost:8080/api/categorias', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
         body: JSON.stringify(nuevaCategoria)
       });
 
       if (response.ok) {
         cargarCategorias();
         cerrarModal();
+      } else {
+        console.error("No se pudo crear la categoría. Revisa tus permisos.");
       }
     } catch (error) {
       console.error("Error al crear desde plantilla", error);
@@ -126,9 +153,14 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
       : 'http://localhost:8080/api/categorias';
 
     try {
+      const token = localStorage.getItem('collectorhub-token'); // 1. Sacamos el token
+
       const response = await fetch(url, {
         method: metodo,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token // 2. ¡Lo enviamos!
+        },
         body: JSON.stringify(categoriaGuardar)
       });
 
@@ -185,11 +217,9 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
         </div>
 
         <div className="categorias-list">
-          {/* Añadimos .filter() para comprobar que haya categorias NO oficiales */}
           {categorias.filter(cat => !cat.esOficial).length === 0 ? (
             <p className="empty-state">Aun no tienes categorias personales. ¡Crea la primera!</p>
           ) : (
-            /* Añadimos .filter() de nuevo justo antes del .map() */
             categorias.filter(cat => !cat.esOficial).map((cat) => (
               <div key={cat.id} className="categoria-card-horizontal">
                 <div className="categoria-info">
