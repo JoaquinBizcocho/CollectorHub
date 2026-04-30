@@ -678,3 +678,15 @@ textarea.input-base {
 .btn-ruta.libre h4 {
   color: #66bb6a;
 }
+/* Animación de pulso para cuando los datos están cargando */
+.efecto-carga {
+  opacity: 0.5;
+  animation: parpadeo 1.5s infinite ease-in-out;
+  color: #ffb300 !important;
+}
+
+@keyframes parpadeo {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}

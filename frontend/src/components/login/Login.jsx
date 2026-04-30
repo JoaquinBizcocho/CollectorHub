@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './Login.css';
 
-const Login = ({ alIrARegistro, alLoginExitoso }) => {
+const Login = ({ alIrARegistro, alEntrar }) => {
   const [alias, setAlias] = useState('');
   const [password, setPassword] = useState('');
   const [mostrarPass, setMostrarPass] = useState(false);
@@ -17,35 +17,40 @@ const Login = ({ alIrARegistro, alLoginExitoso }) => {
   }, [isDarkMode]);
 
 const manejarLogin = async (e) => {
-  e.preventDefault();
-  try {
-    const respuesta = await fetch('http://localhost:8080/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ alias, password })
-    });
+    e.preventDefault();
 
-    const data = await respuesta.json();
-    setMensaje(data.mensaje);
+    try {
+      // 1. Asegúrate de que la ruta tiene /auth/
+      const respuesta = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // 2. Asegúrate de enviar la variable 'alias', no 'correo'
+        body: JSON.stringify({ alias: alias, password: password })
+      });
 
-    // Comprobamos que la respuesta es correcta
-    if (respuesta.ok && data.usuarioId) {
-      localStorage.setItem('collectorhub-usuario-id', data.usuarioId);
-      localStorage.setItem('collectorhub-usuario-alias', alias);
-      localStorage.setItem('collectorhub-rol', data.rol);
-      
-      // Guardamos la "pulsera VIP" (el token) en el bolsillo del navegador
-      localStorage.setItem('collectorhub-token', data.token);
+      // Nuestro backend devuelve un JSON (Map) tanto si hay éxito como si hay error
+      const data = await respuesta.json();
 
-      // Esperamos un segundo para que el usuario pueda leer el mensaje de exito
-      setTimeout(() => {
-        alLoginExitoso();
-      }, 1000);
+     if (respuesta.ok) {
+        // Guardamos todo tu "carnet de identidad" en el navegador
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('usuarioId', data.usuarioId);
+        localStorage.setItem('alias', alias); // Guardamos el nombre que escribiste
+        localStorage.setItem('rol', data.rol);
+        
+        setMensaje("¡Acceso correcto! Entrando...");
+        
+        setTimeout(() => {
+          alEntrar(); 
+        }, 1000);
+      } else {
+        // Si la contraseña está mal o la cuenta no está verificada, mostramos el mensaje del backend
+        setMensaje("Error: " + data.mensaje);
+      }
+    } catch (error) {
+      setMensaje("Error crítico de conexión con el servidor. Revisa que el backend esté encendido.");
     }
-  } catch (error) {
-    setMensaje("Error critico de conexion con el servidor");
-  }
-};
+  };
 
   return (
     <div className="login-card">

@@ -27,13 +27,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Desactivamos CSRF porque usamos JWT
+                .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configure(http))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Dejamos pasar libremente al Login y al Registro
-                        .requestMatchers("/api/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/register").permitAll() // <-- AQUI ESTA EL CAMBIO
+                        .requestMatchers("/api/auth/**").permitAll()
                         // BLOQUEO REAL: Solo los administradores pueden entrar aquí
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // El resto de rutas requieren que estés logueado con un token válido

@@ -5,7 +5,6 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   const [categorias, setCategorias] = useState([]);
   const [plantillas, setPlantillas] = useState([]); 
   
-  // 0: Cerrado, 1: Elegir opcion, 2: Formulario desde cero, 3: Lista de plantillas
   const [pasoModal, setPasoModal] = useState(0); 
   const [idEditando, setIdEditando] = useState(null);
 
@@ -13,8 +12,10 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   const [descripcion, setDescripcion] = useState('');
   const [esquema, setEsquema] = useState([{ nombre: '', tipo: 'text' }]);
   
-  const nombreUsuario = localStorage.getItem('collectorhub-usuario-alias') || 'Coleccionista';
-  const rolUsuario = localStorage.getItem('collectorhub-rol') || 'user';
+  // --- CORRECCIÓN DE CLAVES DE LOCALSTORAGE ---
+  // Antes buscabas 'collectorhub-usuario-alias', ahora usamos 'alias' y 'usuarioId'
+  const nombreUsuario = localStorage.getItem('alias') || 'Coleccionista';
+  const rolUsuario = localStorage.getItem('rol') || 'user';
 
   useEffect(() => {
     cargarCategorias();
@@ -22,14 +23,20 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   }, []);
 
   const cargarCategorias = async () => {
-    const usuarioId = localStorage.getItem('collectorhub-usuario-id');
-    const token = localStorage.getItem('collectorhub-token'); // 1. Sacamos el token
+    // CORRECCIÓN: Usar la clave correcta 'usuarioId' y 'token'
+    const usuarioId = localStorage.getItem('usuarioId');
+    const token = localStorage.getItem('token'); 
+
+    if (!usuarioId || !token) {
+        console.error("No hay sesión activa");
+        return;
+    }
 
     try {
       const response = await fetch(`http://localhost:8080/api/categorias/usuario/${usuarioId}`, {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer ' + token // 2. ¡Lo enviamos!
+          'Authorization': 'Bearer ' + token 
         }
       });
       if (response.ok) {
@@ -41,13 +48,13 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   };
 
   const cargarPlantillas = async () => {
-    const token = localStorage.getItem('collectorhub-token'); // 1. Sacamos el token
+    const token = localStorage.getItem('token'); // CORRECCIÓN
 
     try {
       const response = await fetch('http://localhost:8080/api/categorias/oficiales', {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer ' + token // 2. ¡Lo enviamos!
+          'Authorization': 'Bearer ' + token 
         }
       });
       if (response.ok) {
@@ -84,13 +91,13 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
 
   const borrarCategoria = async (id) => {
     if (window.confirm("¿Estas seguro? Se borraran todos los objetos de esta categoria para siempre.")) {
-      const token = localStorage.getItem('collectorhub-token'); // 1. Sacamos el token
+      const token = localStorage.getItem('token'); // CORRECCIÓN
 
       try {
         const response = await fetch(`http://localhost:8080/api/categorias/${id}`, { 
           method: 'DELETE',
           headers: {
-            'Authorization': 'Bearer ' + token // 2. ¡Lo enviamos!
+            'Authorization': 'Bearer ' + token 
           }
         });
         if (response.ok) cargarCategorias();
@@ -101,7 +108,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   };
 
   const crearDesdePlantilla = async (plantilla) => {
-    const usuarioId = localStorage.getItem('collectorhub-usuario-id');
+    const usuarioId = localStorage.getItem('usuarioId'); // CORRECCIÓN
     
     const nuevaCategoria = {
       nombre: plantilla.nombre,
@@ -112,7 +119,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
     };
 
     try {
-      const token = localStorage.getItem('collectorhub-token');
+      const token = localStorage.getItem('token'); // CORRECCIÓN
 
       const response = await fetch('http://localhost:8080/api/categorias', {
         method: 'POST',
@@ -137,7 +144,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   const guardarCategoria = async (e) => {
     e.preventDefault();
     const esquemaLimpio = esquema.filter(campo => campo.nombre.trim() !== '');
-    const usuarioId = localStorage.getItem('collectorhub-usuario-id');
+    const usuarioId = localStorage.getItem('usuarioId'); // CORRECCIÓN
 
     const categoriaGuardar = {
       nombre,
@@ -153,13 +160,13 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
       : 'http://localhost:8080/api/categorias';
 
     try {
-      const token = localStorage.getItem('collectorhub-token'); // 1. Sacamos el token
+      const token = localStorage.getItem('token'); // CORRECCIÓN
 
       const response = await fetch(url, {
         method: metodo,
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token // 2. ¡Lo enviamos!
+          'Authorization': 'Bearer ' + token 
         },
         body: JSON.stringify(categoriaGuardar)
       });
@@ -333,7 +340,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
 
                 <div className="modal-actions">
                   <button type="button" className="btn-cancelar" onClick={() => setPasoModal(1)}>Volver atras</button>
-                  <button type="button" className="btn-cancelar" onClick={cerrarModal} style={{border: 'none'}}>Cerrar</button>
+                  <button type="button" className="btn-cancelar" onClick={cerrarModal}>Cerrar</button>
                 </div>
               </div>
             )}

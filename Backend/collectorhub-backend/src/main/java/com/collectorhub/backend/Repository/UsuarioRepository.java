@@ -12,6 +12,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     boolean existsByAlias(String alias);
 
     // Le decimos exactamente la consulta que debe hacer para evitar la trampa de la barra baja
-    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM Usuario u WHERE u.correo_electronico = ?1")
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM Usuario u WHERE u.correoElectronico = ?1")
     boolean comprobarSiExisteCorreo(String correo);
 }

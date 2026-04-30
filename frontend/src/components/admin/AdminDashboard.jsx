@@ -8,8 +8,10 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [esquema, setEsquema] = useState([{ nombre: '', tipo: 'text' }]);
+  const [cargandoStats, setCargandoStats] = useState(true);
 
-  const usuarioId = localStorage.getItem('collectorhub-usuario-id');
+  // CORRECCIÓN 1: Usamos la clave limpia 'usuarioId'
+  const usuarioId = localStorage.getItem('usuarioId');
 
   useEffect(() => {
     cargarEstadisticas();
@@ -18,15 +20,14 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
 
   const cargarEstadisticas = async () => {
     try {
-      // 1. Sacamos la "pulsera VIP" del almacenamiento
-      const token = localStorage.getItem('collectorhub-token');
+      setCargandoStats(true);
+      const token = localStorage.getItem('token');
 
-      // 2. Hacemos el fetch añadiendo las cabeceras (headers)
       const response = await fetch('http://localhost:8080/api/admin/estadisticas', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token // ¡Aquí enseñamos el pase!
+          'Authorization': 'Bearer ' + token 
         }
       });
 
@@ -34,16 +35,18 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
         const data = await response.json();
         setEstadisticas(data);
       } else {
-        console.error("Acceso denegado. El token podría estar caducado o no eres admin.");
+        console.error("Acceso denegado. Revisa si el token es de un ADMIN.");
       }
     } catch (error) {
       console.error("Error al cargar estadisticas", error);
+    } finally {
+      setCargandoStats(false); 
     }
   }
 
   const cargarPlantillas = async () => {
     try {
-      const token = localStorage.getItem('collectorhub-token');
+      const token = localStorage.getItem('token'); 
 
       const response = await fetch('http://localhost:8080/api/categorias/oficiales', {
         method: 'GET',
@@ -74,7 +77,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
 
   const borrarPlantilla = async (id) => {
     if (window.confirm("¿Borrar esta plantilla oficial?")) {
-      const token = localStorage.getItem('collectorhub-token');
+      const token = localStorage.getItem('token'); // CORRECCIÓN 4
 
       await fetch(`http://localhost:8080/api/categorias/${id}`, { 
         method: 'DELETE',
@@ -99,7 +102,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
     };
 
     try {
-      const token = localStorage.getItem('collectorhub-token');
+      const token = localStorage.getItem('token'); // CORRECCIÓN 5
 
       const response = await fetch('http://localhost:8080/api/categorias', {
         method: 'POST',
@@ -139,15 +142,21 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
         <div className="estadisticas-grid">
           <div className="estadistica-card">
             <h3>Usuarios Registrados</h3>
-            <p className="estadistica-numero">{estadisticas.totalUsuarios}</p>
+            <p className={`estadistica-numero ${cargandoStats ? 'efecto-carga' : ''}`}>
+              {cargandoStats ? '...' : estadisticas.totalUsuarios}
+            </p>
           </div>
           <div className="estadistica-card">
             <h3>Categorías Creadas</h3>
-            <p className="estadistica-numero">{estadisticas.totalCategorias}</p>
+            <p className={`estadistica-numero ${cargandoStats ? 'efecto-carga' : ''}`}>
+              {cargandoStats ? '...' : estadisticas.totalCategorias}
+            </p>
           </div>
           <div className="estadistica-card">
             <h3>Artículos Totales</h3>
-            <p className="estadistica-numero">{estadisticas.totalArticulos}</p>
+            <p className={`estadistica-numero ${cargandoStats ? 'efecto-carga' : ''}`}>
+              {cargandoStats ? '...' : estadisticas.totalArticulos}
+            </p>
           </div>
         </div>
 

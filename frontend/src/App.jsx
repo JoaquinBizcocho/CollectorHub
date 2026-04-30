@@ -7,17 +7,20 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import "./App.css"
 
 function App() {
+  // CORRECCIÓN: Buscamos 'usuarioId' que es lo que guarda ahora el Login
   const [vistaActual, setVistaActual] = useState(() => {
-    const usuarioGuardado = localStorage.getItem('collectorhub-usuario-id');
+    const usuarioGuardado = localStorage.getItem('usuarioId');
     return usuarioGuardado ? 'dashboard' : 'login';
   });
 
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
 
   const cerrarSesion = () => {
-    localStorage.removeItem('collectorhub-usuario-id');
-    localStorage.removeItem('collectorhub-usuario-alias');
-    localStorage.removeItem('collectorhub-rol'); // Limpiamos el rol tambien
+    // CORRECCIÓN: Limpiamos las llaves nuevas
+    localStorage.removeItem('usuarioId');
+    localStorage.removeItem('alias');
+    localStorage.removeItem('rol');
+    localStorage.removeItem('token');
     setCategoriaSeleccionada(null);
     setVistaActual('login');
   };
@@ -27,7 +30,8 @@ function App() {
       {vistaActual === 'login' && (
         <Login 
           alIrARegistro={() => setVistaActual('register')} 
-          alLoginExitoso={() => setVistaActual('dashboard')} 
+          // CORRECCIÓN: Nombre de prop sincronizado con Login.jsx
+          alEntrar={() => setVistaActual('dashboard')} 
         />
       )}
       {vistaActual === 'register' && (
@@ -40,7 +44,7 @@ function App() {
             setCategoriaSeleccionada(categoria);
             setVistaActual('articulos');
           }}
-          alIrAdmin={() => setVistaActual('admin')} // Le pasamos la funcion para ir al panel
+          alIrAdmin={() => setVistaActual('admin')}
         />
       )}
       {vistaActual === 'articulos' && categoriaSeleccionada && (
@@ -50,7 +54,6 @@ function App() {
           alCerrarSesion={cerrarSesion}
         />
       )}
-      {/* NUEVA VISTA DE ADMIN */}
       {vistaActual === 'admin' && (
         <AdminDashboard 
           alVolver={() => setVistaActual('dashboard')}

@@ -46,7 +46,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     indiceActual: 0 
   });
 
-  const usuarioId = localStorage.getItem('collectorhub-usuario-id');
+const usuarioId = localStorage.getItem('usuarioId');
 
   useEffect(() => {
     cargarArticulos();
@@ -54,7 +54,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
 
   const cargarArticulos = async () => {
     try {
-      const token = localStorage.getItem('collectorhub-token'); // Sacamos token
+      const token = localStorage.getItem('token'); // CORRECCIÓN: Clave corta
       const response = await fetch(`http://localhost:8080/api/articulos/categoria/${categoria.id}/usuario/${usuarioId}`, {
         method: 'GET',
         headers: {
@@ -138,22 +138,41 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     setMostrarModal(true);
   };
 
-  const borrarArticulo = async (id) => {
-    if (window.confirm("Estas seguro de que quieres borrar este articulo?")) {
-      const token = localStorage.getItem('collectorhub-token'); 
-      await fetch(`http://localhost:8080/api/articulos/${id}`, { 
-        method: 'DELETE',
-        headers: {
-          'Authorization': 'Bearer ' + token 
+ const borrarArticulo = async (id) => {
+    if (window.confirm("¿Estás seguro de que quieres borrar este artículo?")) {
+      // 1. CORRECCIÓN: Usamos la llave corta 'token'
+      const token = localStorage.getItem('token'); 
+
+      try {
+        const response = await fetch(`http://localhost:8080/api/articulos/${id}`, { 
+          method: 'DELETE',
+          headers: {
+            // 2. IMPORTANTE: Enviamos el token para que el "vigilante" nos deje pasar
+            'Authorization': 'Bearer ' + token 
+          }
+        });
+
+        if (response.ok) {
+          // Si todo va bien, refrescamos la lista
+          cargarArticulos();
+        } else {
+          // Si el servidor responde con error (ej: 403), lo vemos aquí
+          const errorTexto = await response.text();
+          alert("Error al eliminar: El servidor rechazó la operación. " + errorTexto);
         }
-      });
-      cargarArticulos();
+      } catch (error) {
+        console.error("Error de conexión al borrar", error);
+        alert("Error crítico de conexión al intentar borrar.");
+      }
     }
   };
 
   const guardarArticulo = async (e) => {
     e.preventDefault();
+    
+    // LA CLAVE: Incluimos el ID si estamos editando
     const articuloGuardar = {
+      id: idEditando, // <--- Si es null, crea. Si tiene valor, edita.
       categoriaId: categoria.id,
       usuarioId: parseInt(usuarioId),
       datos: datosFormulario,
@@ -165,7 +184,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     const url = idEditando ? `http://localhost:8080/api/articulos/${idEditando}` : 'http://localhost:8080/api/articulos';
     
     try {
-      const token = localStorage.getItem('collectorhub-token');
+      const token = localStorage.getItem('token');
 
       const response = await fetch(url, {
         method: metodo, 
@@ -179,8 +198,9 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
       if (response.ok) {
         cargarArticulos(); 
         setMostrarModal(false);
+        setIdEditando(null); // Limpiamos el estado al terminar
       } else {
-        console.error("El servidor rechazó la petición. Revisa el token.");
+        alert("Error de permisos: El servidor rechazó la operación.");
       }
     } catch (error) {
       console.error("Error al guardar", error);
