@@ -12,8 +12,6 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   const [descripcion, setDescripcion] = useState('');
   const [esquema, setEsquema] = useState([{ nombre: '', tipo: 'text' }]);
   
-  // --- CORRECCIÓN DE CLAVES DE LOCALSTORAGE ---
-  // Antes buscabas 'collectorhub-usuario-alias', ahora usamos 'alias' y 'usuarioId'
   const nombreUsuario = localStorage.getItem('alias') || 'Coleccionista';
   const rolUsuario = localStorage.getItem('rol') || 'user';
 
@@ -23,7 +21,6 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   }, []);
 
   const cargarCategorias = async () => {
-    // CORRECCIÓN: Usar la clave correcta 'usuarioId' y 'token'
     const usuarioId = localStorage.getItem('usuarioId');
     const token = localStorage.getItem('token'); 
 
@@ -48,7 +45,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   };
 
   const cargarPlantillas = async () => {
-    const token = localStorage.getItem('token'); // CORRECCIÓN
+    const token = localStorage.getItem('token'); 
 
     try {
       const response = await fetch('http://localhost:8080/api/categorias/oficiales', {
@@ -65,7 +62,6 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
     }
   };
 
-  // --- LOGICA DEL MODAL ---
   
   const abrirSelectorNuevaCategoria = () => {
     setIdEditando(null);
@@ -87,11 +83,10 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
     setPasoModal(0);
   };
 
-  // --- LOGICA DE GUARDADO Y BORRADO ---
 
   const borrarCategoria = async (id) => {
     if (window.confirm("¿Estas seguro? Se borraran todos los objetos de esta categoria para siempre.")) {
-      const token = localStorage.getItem('token'); // CORRECCIÓN
+      const token = localStorage.getItem('token'); 
 
       try {
         const response = await fetch(`http://localhost:8080/api/categorias/${id}`, { 
@@ -108,7 +103,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   };
 
   const crearDesdePlantilla = async (plantilla) => {
-    const usuarioId = localStorage.getItem('usuarioId'); // CORRECCIÓN
+    const usuarioId = localStorage.getItem('usuarioId'); 
     
     const nuevaCategoria = {
       nombre: plantilla.nombre,
@@ -119,7 +114,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
     };
 
     try {
-      const token = localStorage.getItem('token'); // CORRECCIÓN
+      const token = localStorage.getItem('token'); 
 
       const response = await fetch('http://localhost:8080/api/categorias', {
         method: 'POST',
@@ -144,7 +139,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   const guardarCategoria = async (e) => {
     e.preventDefault();
     const esquemaLimpio = esquema.filter(campo => campo.nombre.trim() !== '');
-    const usuarioId = localStorage.getItem('usuarioId'); // CORRECCIÓN
+    const usuarioId = localStorage.getItem('usuarioId'); 
 
     const categoriaGuardar = {
       nombre,
@@ -160,7 +155,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
       : 'http://localhost:8080/api/categorias';
 
     try {
-      const token = localStorage.getItem('token'); // CORRECCIÓN
+      const token = localStorage.getItem('token'); 
 
       const response = await fetch(url, {
         method: metodo,
@@ -180,7 +175,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
     }
   };
 
-  // --- LOGICA DE ESQUEMAS DINAMICOS ---
+  
 
   const agregarCampoEsquema = () => setEsquema([...esquema, { nombre: '', tipo: 'text' }]);
   const actualizarCampoEsquema = (index, campo, valor) => {
@@ -245,11 +240,11 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
           )}
         </div>
 
-        {/* --- MODAL MULTIPASO --- */}
+        
         {pasoModal > 0 && (
           <div className="modal-overlay">
             
-            {/* PASO 1: ELEGIR RUTA */}
+            
             {pasoModal === 1 && (
               <div className="modal-content" style={{textAlign: 'center'}}>
                 <h3 style={{marginBottom: '30px'}}>¿Como quieres empezar?</h3>
@@ -272,7 +267,6 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
               </div>
             )}
 
-            {/* PASO 2: FORMULARIO NORMAL (DESDE CERO) */}
             {pasoModal === 2 && (
               <div className="modal-content">
                 <h3>{idEditando ? 'Editar Categoria' : 'Crear Nueva Categoria'}</h3>
@@ -308,7 +302,6 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
               </div>
             )}
 
-            {/* PASO 3: LISTA DE PLANTILLAS OFICIALES */}
             {pasoModal === 3 && (
               <div className="modal-content modal-largo">
                 <h3>Seleccionar plantilla oficial</h3>

@@ -98,7 +98,7 @@
 .categorias-list {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; /* Separación entre filas */
+  gap: 1.5rem; 
 }
 
 .categoria-card-horizontal {
@@ -106,7 +106,7 @@
   padding: 1.5rem 2rem;
   border-radius: 15px;
   box-shadow: 0 5px 15px var(--sombra);
-  display: flex; /* Para poner texto a la izq y botón a la der */
+  display: flex; 
   justify-content: space-between;
   align-items: center;
   transition: all 0.3s ease;
@@ -115,9 +115,9 @@
 }
 
 .categoria-card-horizontal:hover {
-  transform: translateX(5px); /* Efecto de deslizar un poco a la derecha */
+  transform: translateX(5px); 
   box-shadow: 0 8px 25px var(--sombra);
-  border-left: 5px solid #66bb6a; /* Un toque visual al hacer hover */
+  border-left: 5px solid #66bb6a; 
 }
 
 .categoria-info h4 {
@@ -145,7 +145,7 @@
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 150px; /* Para que todos los botones midan igual */
+  min-width: 150px; 
 }
 
 .btn-entrar:hover {
@@ -159,7 +159,7 @@
   opacity: 0.7;
 }
 
-/* --- MANTENEMOS EL MODAL EXACTAMENTE IGUAL --- */
+
 .modal-overlay {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
   background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
@@ -271,7 +271,7 @@ textarea.input-base {
   cursor: pointer; 
 }
 
-/* --- ACCIONES DE LA TARJETA (Editar/Borrar) --- */
+
 .categoria-acciones {
   display: flex;
   align-items: center;
@@ -298,7 +298,7 @@ textarea.input-base {
   border-color: #ef5350;
 }
 
-/* --- TOPBAR BOTONES --- */
+
 .topbar-actions {
   display: flex;
   gap: 15px;
@@ -314,7 +314,6 @@ textarea.input-base {
   padding: 8px;
 }
 
-/* --- TARJETA DE ARTICULO --- */
 .articulo-card {
   background: var(--bg-tarjeta);
   padding: 1.5rem;
@@ -322,14 +321,13 @@ textarea.input-base {
   box-shadow: 0 5px 15px var(--sombra);
   display: flex;
   justify-content: space-between;
-  align-items: stretch; /* Para que todos ocupen el mismo alto */
+  align-items: stretch; 
   transition: all 0.3s ease;
   width: 100%;
   box-sizing: border-box;
   gap: 20px;
 }
 
-/* 1. Recuadro de imagen (Izquierda) */
 .articulo-imagen-container {
   width: 150px;
   height: 150px;
@@ -355,7 +353,6 @@ textarea.input-base {
   text-align: center;
 }
 
-/* 2. Caracteristicas (Centro) */
 .articulo-info {
   flex-grow: 1;
   display: grid;
@@ -381,7 +378,6 @@ textarea.input-base {
   color: var(--texto-input);
 }
 
-/* 3. Botones (Derecha, vertical) */
 .articulo-acciones-vertical {
   display: flex;
   flex-direction: column;
@@ -413,7 +409,6 @@ textarea.input-base {
   border-color: #ef5350;
 }
 
-/* --- MODAL ESPECIFICO ARTICULOS --- */
 .campos-dinamicos-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -475,38 +470,33 @@ textarea.input-base {
 }
 
 
-/* Clase para que la miniatura de la tarjeta parezca clickable */
 .articulo-imagen-preview.clickable {
   cursor: pointer;
-  transition: transform 0.2s ease; /* Pequeño efecto al pasar el raton */
+  transition: transform 0.2s ease; 
 }
 
 .articulo-imagen-preview.clickable:hover {
-  transform: scale(1.05); /* Se agranda un poco en la tarjeta al hacer hover */
+  transform: scale(1.05); 
 }
 
-/* --- ESTILOS PARA EL LIGHTBOX (IMAGEN GRANDE) --- */
 
-/* El fondo oscuro y difuminado que ocupa toda la pantalla */
 .lightbox-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.85); /* Fondo negro muy opaco */
-  backdrop-filter: blur(8px); /* Aqui esta el efecto de difuminado */
+  background: rgba(0, 0, 0, 0.85); 
+  backdrop-filter: blur(8px); 
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 2000; /* Aseguramos que este por encima de todo, incluso de los modales normales */
+  z-index: 2000; 
   
-  /* Animacion suave de entrada */
   opacity: 0;
   animation: fadeInLightbox 0.3s forwards;
 }
 
-/* Contenedor relativo para posicionar la X de cerrar */
 .lightbox-content {
   position: relative;
   max-width: 90%;
@@ -516,19 +506,17 @@ textarea.input-base {
   align-items: center;
 }
 
-/* La imagen real agrandada */
 .lightbox-img {
   max-width: 100%;
-  max-height: 90vh; /* Que no supere el alto de la pantalla */
-  object-fit: contain; /* Mantiene la proporcion de la imagen */
+  max-height: 90vh; 
+  object-fit: contain; 
   border-radius: 10px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.5);
 }
 
-/* Boton X para cerrar la imagen grande */
 .btn-close-lightbox {
   position: absolute;
-  top: -40px; /* Posicionado por encima de la imagen */
+  top: -40px; 
   right: 0;
   background: transparent;
   border: 2px solid white;
@@ -551,12 +539,10 @@ textarea.input-base {
   transform: scale(1.1);
 }
 
-/* Animacion de aparicion */
 @keyframes fadeInLightbox {
   to { opacity: 1; }
 }
 
-/* --- FLECHAS DE NAVEGACION DEL LIGHTBOX --- */
 .btn-flecha-lightbox {
   position: absolute;
   top: 50%;
@@ -573,7 +559,7 @@ textarea.input-base {
   align-items: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  z-index: 2001; /* Por encima de la imagen */
+  z-index: 2001; 
 }
 
 .btn-flecha-lightbox:hover {
@@ -589,13 +575,11 @@ textarea.input-base {
   right: -70px;
 }
 
-/* En moviles o pantallas pequeñas, metemos las flechas un poco hacia adentro */
 @media (max-width: 768px) {
   .btn-flecha-lightbox.izq { left: 10px; }
   .btn-flecha-lightbox.der { right: 10px; }
 }
 
-/* --- ANIMACION DE TRANSICION SUAVE (FADE) --- */
 .animacion-fade {
   animation: fadeIn 0.5s ease-in-out;
 }
@@ -605,7 +589,6 @@ textarea.input-base {
   100% { opacity: 1; }
 }
 
-/* --- ESTADISTICAS ADMIN --- */
 .estadisticas-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -632,7 +615,6 @@ textarea.input-base {
   color: #ffb300;
 }
 
-/* --- RUTAS DEL MODAL --- */
 .opciones-ruta-grid {
   display: flex;
   flex-direction: column;
@@ -678,7 +660,6 @@ textarea.input-base {
 .btn-ruta.libre h4 {
   color: #66bb6a;
 }
-/* Animación de pulso para cuando los datos están cargando */
 .efecto-carga {
   opacity: 0.5;
   animation: parpadeo 1.5s infinite ease-in-out;

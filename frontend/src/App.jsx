@@ -7,7 +7,7 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import "./App.css"
 
 function App() {
-  // CORRECCIÓN: Buscamos 'usuarioId' que es lo que guarda ahora el Login
+
   const [vistaActual, setVistaActual] = useState(() => {
     const usuarioGuardado = localStorage.getItem('usuarioId');
     return usuarioGuardado ? 'dashboard' : 'login';
@@ -16,7 +16,6 @@ function App() {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
 
   const cerrarSesion = () => {
-    // CORRECCIÓN: Limpiamos las llaves nuevas
     localStorage.removeItem('usuarioId');
     localStorage.removeItem('alias');
     localStorage.removeItem('rol');
@@ -30,7 +29,6 @@ function App() {
       {vistaActual === 'login' && (
         <Login 
           alIrARegistro={() => setVistaActual('register')} 
-          // CORRECCIÓN: Nombre de prop sincronizado con Login.jsx
           alEntrar={() => setVistaActual('dashboard')} 
         />
       )}

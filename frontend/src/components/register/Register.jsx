@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import './Register.css';
 
 const Register = ({ alIrALogin }) => {
-  const [paso, setPaso] = useState(1); // Paso 1: Datos | Paso 2: PIN
+  const [paso, setPaso] = useState(1); 
   const [alias, setAlias] = useState('');
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
@@ -45,8 +45,8 @@ const Register = ({ alIrALogin }) => {
       const texto = await respuesta.text();
       
       if (respuesta.ok) {
-        setMensaje("✅ Te hemos enviado un código de 6 dígitos a tu correo.");
-        setPaso(2); // Pasamos a la pantalla del PIN
+        setMensaje("Te hemos enviado un código de 6 dígitos a tu correo.");
+        setPaso(2); 
       } else {
         setMensaje(texto);
       }
@@ -55,7 +55,7 @@ const Register = ({ alIrALogin }) => {
     }
   };
 
-  // --- FASE 2: VERIFICAR EL PIN ---
+ 
   const manejarVerificacion = async (e) => {
     e.preventDefault();
     try {
@@ -68,12 +68,12 @@ const Register = ({ alIrALogin }) => {
       const texto = await respuesta.text();
 
       if (respuesta.ok) {
-        setMensaje("🎉 ¡Cuenta verificada con éxito! Redirigiendo al login...");
+        setMensaje("¡Cuenta verificada con éxito! Redirigiendo al login...");
         setTimeout(() => {
           alIrALogin();
         }, 3000);
       } else {
-        setMensaje("❌ " + texto);
+        setMensaje(texto);
       }
     } catch (error) {
       setMensaje("Error de conexión al verificar.");
@@ -85,7 +85,7 @@ const Register = ({ alIrALogin }) => {
       <h1 className="register-title">{paso === 1 ? "Crear Cuenta" : "Verifica tu correo"}</h1>
       <p className="register-subtitle">{paso === 1 ? "Únete a CollectorHub" : "Introduce el PIN que hemos enviado a tu email"}</p>
       
-      {/* FORMULARIO DE REGISTRO (PASO 1) */}
+
       {paso === 1 && (
         <form onSubmit={manejarRegistro} className="register-form">
           <div className="register-input-group">
@@ -104,7 +104,7 @@ const Register = ({ alIrALogin }) => {
         </form>
       )}
 
-      {/* FORMULARIO DEL PIN (PASO 2) */}
+
       {paso === 2 && (
         <form onSubmit={manejarVerificacion} className="register-form">
           <div className="register-input-group">

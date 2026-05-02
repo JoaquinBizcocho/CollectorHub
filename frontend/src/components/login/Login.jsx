@@ -20,22 +20,18 @@ const manejarLogin = async (e) => {
     e.preventDefault();
 
     try {
-      // 1. Asegúrate de que la ruta tiene /auth/
       const respuesta = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // 2. Asegúrate de enviar la variable 'alias', no 'correo'
         body: JSON.stringify({ alias: alias, password: password })
       });
 
-      // Nuestro backend devuelve un JSON (Map) tanto si hay éxito como si hay error
       const data = await respuesta.json();
 
      if (respuesta.ok) {
-        // Guardamos todo tu "carnet de identidad" en el navegador
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuarioId', data.usuarioId);
-        localStorage.setItem('alias', alias); // Guardamos el nombre que escribiste
+        localStorage.setItem('alias', alias); 
         localStorage.setItem('rol', data.rol);
         
         setMensaje("¡Acceso correcto! Entrando...");
@@ -44,7 +40,6 @@ const manejarLogin = async (e) => {
           alEntrar(); 
         }, 1000);
       } else {
-        // Si la contraseña está mal o la cuenta no está verificada, mostramos el mensaje del backend
         setMensaje("Error: " + data.mensaje);
       }
     } catch (error) {

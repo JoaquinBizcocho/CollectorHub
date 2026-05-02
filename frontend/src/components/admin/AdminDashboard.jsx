@@ -10,7 +10,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
   const [esquema, setEsquema] = useState([{ nombre: '', tipo: 'text' }]);
   const [cargandoStats, setCargandoStats] = useState(true);
 
-  // CORRECCIÓN 1: Usamos la clave limpia 'usuarioId'
+  
   const usuarioId = localStorage.getItem('usuarioId');
 
   useEffect(() => {
@@ -77,7 +77,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
 
   const borrarPlantilla = async (id) => {
     if (window.confirm("¿Borrar esta plantilla oficial?")) {
-      const token = localStorage.getItem('token'); // CORRECCIÓN 4
+      const token = localStorage.getItem('token'); 
 
       await fetch(`http://localhost:8080/api/categorias/${id}`, { 
         method: 'DELETE',
@@ -102,7 +102,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
     };
 
     try {
-      const token = localStorage.getItem('token'); // CORRECCIÓN 5
+      const token = localStorage.getItem('token'); 
 
       const response = await fetch('http://localhost:8080/api/categorias', {
         method: 'POST',

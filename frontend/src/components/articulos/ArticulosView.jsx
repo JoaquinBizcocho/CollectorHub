@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import '../categorias/Categorias.css';
 
-// --- MINI-COMPONENTE PARA EL CARRUSEL DE LA TARJETA ---
+
 const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
   const [indice, setIndice] = useState(0);
   
@@ -32,7 +32,7 @@ const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
   );
 };
 
-// --- COMPONENTE PRINCIPAL ---
+
 const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
   const [articulos, setArticulos] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -54,11 +54,11 @@ const usuarioId = localStorage.getItem('usuarioId');
 
   const cargarArticulos = async () => {
     try {
-      const token = localStorage.getItem('token'); // CORRECCIÓN: Clave corta
+      const token = localStorage.getItem('token'); 
       const response = await fetch(`http://localhost:8080/api/articulos/categoria/${categoria.id}/usuario/${usuarioId}`, {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer ' + token // Enseñamos pase
+          'Authorization': 'Bearer ' + token 
         }
       });
       if (response.ok) {
@@ -140,23 +140,20 @@ const usuarioId = localStorage.getItem('usuarioId');
 
  const borrarArticulo = async (id) => {
     if (window.confirm("¿Estás seguro de que quieres borrar este artículo?")) {
-      // 1. CORRECCIÓN: Usamos la llave corta 'token'
+      
       const token = localStorage.getItem('token'); 
 
       try {
         const response = await fetch(`http://localhost:8080/api/articulos/${id}`, { 
           method: 'DELETE',
           headers: {
-            // 2. IMPORTANTE: Enviamos el token para que el "vigilante" nos deje pasar
             'Authorization': 'Bearer ' + token 
           }
         });
 
         if (response.ok) {
-          // Si todo va bien, refrescamos la lista
           cargarArticulos();
         } else {
-          // Si el servidor responde con error (ej: 403), lo vemos aquí
           const errorTexto = await response.text();
           alert("Error al eliminar: El servidor rechazó la operación. " + errorTexto);
         }
@@ -170,9 +167,8 @@ const usuarioId = localStorage.getItem('usuarioId');
   const guardarArticulo = async (e) => {
     e.preventDefault();
     
-    // LA CLAVE: Incluimos el ID si estamos editando
     const articuloGuardar = {
-      id: idEditando, // <--- Si es null, crea. Si tiene valor, edita.
+      id: idEditando, 
       categoriaId: categoria.id,
       usuarioId: parseInt(usuarioId),
       datos: datosFormulario,
@@ -198,7 +194,7 @@ const usuarioId = localStorage.getItem('usuarioId');
       if (response.ok) {
         cargarArticulos(); 
         setMostrarModal(false);
-        setIdEditando(null); // Limpiamos el estado al terminar
+        setIdEditando(null); 
       } else {
         alert("Error de permisos: El servidor rechazó la operación.");
       }
@@ -306,7 +302,7 @@ const usuarioId = localStorage.getItem('usuarioId');
           </div>
         )}
 
-        {/* --- LIGHTBOX CON FLECHAS DE NAVEGACION --- */}
+        {/* --- FLECHAS DE NAVEGACION --- */}
         {lightbox.activo && (
           <div className="lightbox-overlay" onClick={cerrarLightbox}>
             <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>

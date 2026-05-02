@@ -93,10 +93,9 @@
   box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
 }
 
-/* --- ESTILOS DE NAVEGACIÓN --- */
 .login-footer {
   margin-top: 2rem;
-  color: var(--texto-input); /* Se adapta al tema */
+  color: var(--texto-input); 
 }
 
 .login-link-btn {
