@@ -32,7 +32,6 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // --- 1. LOGIN ---
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> credenciales) {
         String alias = credenciales.get("alias");
@@ -66,7 +65,6 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
-    // --- 2. REGISTRO ---
     @PostMapping("/register")
     public ResponseEntity<String> registrarUsuario(@RequestBody Usuario nuevoUsuario) {
 
@@ -111,7 +109,6 @@ public class AuthController {
         return ResponseEntity.ok("Registro guardado. Esperando PIN de verificacion.");
     }
 
-    // --- 3. VERIFICAR PIN ---
     @PostMapping("/verify-pin")
     public ResponseEntity<String> verificarPin(@RequestBody Map<String, String> datos) {
         String alias = datos.get("alias");
