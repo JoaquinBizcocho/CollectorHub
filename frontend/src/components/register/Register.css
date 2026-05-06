@@ -132,3 +132,39 @@
   background-color: #1e3325;
   color: #e8f5e9;
 }
+/* =========================================
+   RESPONSIVE DESIGN - MOBILE (Añadido al final)
+   ========================================= */
+@media (max-width: 768px) {
+  .register-card {
+    width: 90%; /* Quitamos los 500px fijos */
+    max-width: 400px;
+    padding: 2rem 1.5rem; /* Reducimos el relleno interior */
+    border-radius: 20px;
+  }
+
+  .register-card h1 {
+    font-size: 2.2rem; /* Título adaptado a móvil */
+  }
+
+  .register-subtitle {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .register-input-group input {
+    padding: 15px;
+    font-size: 1rem;
+  }
+
+  .register-submit-btn {
+    padding: 15px;
+    font-size: 1.1rem;
+  }
+
+  .register-theme-btn {
+    top: 15px;
+    right: 15px;
+    font-size: 1.3rem;
+  }
+}

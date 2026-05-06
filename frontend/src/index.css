@@ -30,9 +30,10 @@
 
 html, body, #root {
   width: 100vw;
-  height: 100vh;
-  background-color: var(--bg-global); /* Usa la variable */
-  overflow: hidden;
+  min-height: 100vh; /* 1. CAMBIADO: De height a min-height para que pueda crecer */
+  background-color: var(--bg-global);
+  overflow-x: hidden; /* 2. CAMBIADO: Oculta solo el scroll horizontal (derecha/izquierda) */
+  overflow-y: auto;   /* 3. CAMBIADO: Activa el scroll vertical (arriba/abajo) cuando sea necesario */
   font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  transition: background-color 0.3s ease; /* Transición suave al cambiar de modo */
+  transition: background-color 0.3s ease; 
 }

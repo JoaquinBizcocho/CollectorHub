@@ -139,6 +139,12 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   const guardarCategoria = async (e) => {
     e.preventDefault();
     const esquemaLimpio = esquema.filter(campo => campo.nombre.trim() !== '');
+
+    if (esquemaLimpio.length === 0) {
+      alert("Error: No puedes crear una categoría vacía. Añade al menos un campo personalizado y ponle un nombre.");
+      return; 
+    }
+
     const usuarioId = localStorage.getItem('usuarioId'); 
 
     const categoriaGuardar = {

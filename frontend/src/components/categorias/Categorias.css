@@ -89,9 +89,10 @@
   transition: transform 0.2s, background 0.3s;
 }
 
-.btn-nueva-categoria:hover {
-  background-color: #4caf50;
-  transform: translateY(-2px);
+.categoria-card-horizontal:hover {
+  transform: translateX(5px); 
+  box-shadow: 0 8px 25px var(--sombra);
+  border-left: 5px solid #66bb6a; 
 }
 
 /* --- LISTA DE TARJETAS HORIZONTALES APILADAS --- */
@@ -307,11 +308,18 @@ textarea.input-base {
 .btn-volver {
   background-color: transparent;
   color: white;
-  border: none;
+  border: 2px solid white; /* Añadimos el borde igual que cerrar sesión */
+  padding: 8px 16px;       /* Mismo padding para que midan igual de alto */
+  border-radius: 8px;      /* Esquinas redondeadas */
   font-weight: bold;
   cursor: pointer;
-  text-decoration: underline;
-  padding: 8px;
+  text-decoration: none;   /* Le quitamos el subrayado feo */
+  transition: all 0.3s ease;
+}
+
+.btn-volver:hover {
+  background-color: white;
+  color: #4caf50; 
 }
 
 .articulo-card {
@@ -431,10 +439,36 @@ textarea.input-base {
   margin-bottom: 20px;
 }
 
+/* 1. Arreglamos la fuente del texto "No se ha seleccionado ningún archivo" */
 .input-file {
   margin-bottom: 15px;
   color: var(--texto-input);
+  font-family: inherit; /* Fuerza a usar la fuente bonita de tu App */
+  font-size: 0.95rem;
 }
+
+/* 2. Le damos estilo de botón PRO al recuadro gris feo */
+.input-file {
+  margin-bottom: 15px;
+  color: var(--texto-input);
+  font-family: inherit; 
+  font-size: 0.95rem;
+    width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: nowrap;       /* Obliga al texto a quedarse en una sola línea */
+  overflow: hidden;          /* Oculta lo que se salga de la caja */
+  text-overflow: ellipsis;   /* Añade los puntos suspensivos (...) al final */
+  display: block;
+}
+
+/* 3. Efecto al pasar el ratón por encima */
+.input-file::file-selector-button:hover {
+  background-color: #4caf50;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+}
+
 
 .imagenes-preview-container {
   display: flex;
@@ -670,4 +704,132 @@ textarea.input-base {
   0% { opacity: 0.3; }
   50% { opacity: 1; }
   100% { opacity: 0.3; }
+}
+
+/* =========================================
+   RESPONSIVE DESIGN - MOBILE (Añadido al final)
+   ========================================= */
+@media (max-width: 768px) {
+  /* 1. Cabecera superior */
+  .dashboard-topbar {
+    padding: 15px 20px;
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  /* 2. Contenedor principal y cabecera de sección */
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .btn-nueva-categoria {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* 3. Tarjetas de categorías (Pasan de horizontal a vertical) */
+  .categoria-card-horizontal {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem;
+    gap: 15px;
+  }
+
+  .categoria-card-horizontal:hover,
+  .categoria-card-horizontal:active {
+    transform: none !important; 
+    box-shadow: 0 5px 15px var(--sombra) !important; /* Mantiene la sombra original sin crecer */
+    border-left: none !important; /* Quita la raya verde */
+  }
+  /* --------------------------------------------------- */
+
+  .categoria-acciones {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  
+  .btn-entrar {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  /* 4. Tarjetas de Artículos */
+  .articulo-card {
+    flex-direction: column;
+    align-items: center;
+    padding: 1.2rem;
+    text-align: center;
+  }
+
+  .articulo-info {
+    grid-template-columns: 1fr; /* Una sola columna para los datos */
+    width: 100%;
+    text-align: left;
+  }
+
+  .articulo-acciones-vertical {
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 15px;
+  }
+
+  .btn-icon-text {
+    flex: 1;
+    min-width: 100px;
+  }
+
+  /* 5. Modales y Formularios */
+  .modal-content {
+    padding: 1.5rem;
+    width: 95%;
+  }
+
+  .campos-dinamicos-grid {
+    grid-template-columns: 1fr; /* Los inputs del artículo bajan a 1 columna */
+  }
+
+  .esquema-row {
+    flex-direction: column;
+  }
+  
+  .esquema-row button {
+    padding: 12px;
+    margin-top: 5px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .btn-guardar, .btn-cancelar {
+    width: 100%;
+  }
+
+  /* 6. Panel de Administración (Estadísticas) */
+  .estadisticas-grid {
+    grid-template-columns: 1fr; /* Una tarjeta debajo de otra */
+  }
+  /* Solo aplica el hover si el dispositivo tiene un cursor (ratón) */
+@media (hover: hover) {
+  .categoria-card-horizontal:hover {
+    transform: translateX(5px); 
+    box-shadow: 0 8px 25px var(--sombra);
+    border-left: 5px solid #66bb6a; 
+  }
+  
+  .btn-ruta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  }
+}
 }

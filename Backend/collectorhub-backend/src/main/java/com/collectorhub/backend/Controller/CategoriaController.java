@@ -1,5 +1,6 @@
 package com.collectorhub.backend.Controller;
 
+import com.collectorhub.backend.DTO.CategoriaDTO;
 import com.collectorhub.backend.Entidades.Categoria;
 import com.collectorhub.backend.Repository.CategoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/categorias")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173")
 public class CategoriaController {
 
     @Autowired
@@ -21,28 +22,31 @@ public class CategoriaController {
         return categoriaRepository.findByUsuarioId(usuarioId);
     }
 
-    // Obtener solo las plantillas oficiales
     @GetMapping("/oficiales")
     public List<Categoria> obtenerPlantillasOficiales() {
         return categoriaRepository.findByEsOficialTrue();
     }
 
     @PostMapping
-    public ResponseEntity<Categoria> crearCategoria(@RequestBody Categoria categoria) {
-        // Si no nos dicen si es oficial, por defecto es false
-        if (categoria.getEsOficial() == null) {
-            categoria.setEsOficial(false);
-        }
+    public ResponseEntity<Categoria> crearCategoria(@RequestBody CategoriaDTO dto) {
+        Categoria categoria = new Categoria();
+        categoria.setNombre(dto.getNombre());
+        categoria.setDescripcion(dto.getDescripcion());
+        categoria.setUsuarioId(dto.getUsuarioId());
+        categoria.setEsquema(dto.getEsquema());
+        categoria.setEsOficial(dto.getEsOficial() != null ? dto.getEsOficial() : false);
+
         return ResponseEntity.ok(categoriaRepository.save(categoria));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Categoria> actualizarCategoria(@PathVariable Integer id, @RequestBody Categoria categoriaActualizada) {
+    public ResponseEntity<Categoria> actualizarCategoria(@PathVariable Integer id, @RequestBody CategoriaDTO dto) {
         return categoriaRepository.findById(id)
                 .map(cat -> {
-                    cat.setNombre(categoriaActualizada.getNombre());
-                    cat.setDescripcion(categoriaActualizada.getDescripcion());
-                    cat.setEsquema(categoriaActualizada.getEsquema());
+                    // Protegemos el ID y el Creador (usuarioId) para que no puedan ser modificados en un PUT
+                    cat.setNombre(dto.getNombre());
+                    cat.setDescripcion(dto.getDescripcion());
+                    cat.setEsquema(dto.getEsquema());
                     return ResponseEntity.ok(categoriaRepository.save(cat));
                 })
                 .orElse(ResponseEntity.notFound().build());

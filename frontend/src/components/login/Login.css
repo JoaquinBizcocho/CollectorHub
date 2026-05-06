@@ -125,3 +125,36 @@
   background-color: #1e3325;
   color: #e8f5e9;
 }
+
+/* =========================================
+   RESPONSIVE DESIGN - MOBILE (Añadido al final)
+   ========================================= */
+@media (max-width: 768px) {
+  .login-card {
+    width: 90%; /* Quitamos los 500px fijos para que se adapte a la pantalla */
+    max-width: 400px;
+    padding: 2rem 1.5rem; /* Reducimos el relleno para que los inputs tengan espacio */
+    border-radius: 20px;
+  }
+
+  .login-card h1 {
+    font-size: 2.2rem; /* Hacemos el título un pelín más pequeño */
+    margin-bottom: 2rem;
+  }
+
+  .login-input-group input {
+    padding: 15px; /* Ajustamos el tamaño para dedos en pantallas táctiles */
+    font-size: 1rem;
+  }
+
+  .login-submit-btn {
+    padding: 15px;
+    font-size: 1.1rem;
+  }
+
+  .login-theme-btn {
+    top: 15px;
+    right: 15px;
+    font-size: 1.3rem;
+  }
+}

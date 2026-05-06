@@ -25,7 +25,7 @@ function App() {
   };
 
   return (
-    <main className="main-layout">
+    <main className={vistaActual === 'login' || vistaActual === 'register' ? "main-layout" : ""}>
       {vistaActual === 'login' && (
         <Login 
           alIrARegistro={() => setVistaActual('register')} 
