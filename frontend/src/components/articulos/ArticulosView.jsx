@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import '../categorias/Categorias.css';
 
-
 const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
   const [indice, setIndice] = useState(0);
   
@@ -31,7 +30,6 @@ const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
     />
   );
 };
-
 
 const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
   const [articulos, setArticulos] = useState([]);
@@ -167,6 +165,26 @@ const usuarioId = localStorage.getItem('usuarioId');
   const guardarArticulo = async (e) => {
     e.preventDefault();
     
+    let hayCamposVacios = false;
+    const camposFaltantes = [];
+
+    if (categoria.esquema) {
+      categoria.esquema.forEach((campo) => {
+        const valor = datosFormulario[campo.nombre];
+        
+        if (valor === undefined || valor === null || String(valor).trim() === "") {
+          hayCamposVacios = true;
+          camposFaltantes.push(campo.nombre);
+        }
+      });
+    }
+
+    if (hayCamposVacios) {
+      alert(`Por favor, rellena todos los campos obligatorios. Te falta: ${camposFaltantes.join(', ')}`);
+      return; 
+    }
+    // -----------------------------------------
+    
     const articuloGuardar = {
       id: idEditando, 
       categoriaId: categoria.id,
@@ -276,7 +294,14 @@ const usuarioId = localStorage.getItem('usuarioId');
                           <option value="false">No</option>
                         </select>
                       ) : (
-                        <input type={campo.tipo === 'number' ? 'number' : campo.tipo === 'date' ? 'date' : 'text'} className="input-base" placeholder={`Introduce ${campo.nombre}`} value={datosFormulario[campo.nombre] || ''} onChange={(e) => manejarCambioInput(campo.nombre, e.target.value)} />
+                        <input 
+                          type={campo.tipo === 'number' ? 'number' : campo.tipo === 'date' ? 'date' : 'text'} 
+                          className="input-base" 
+                          placeholder={`Introduce ${campo.nombre}`} 
+                          value={datosFormulario[campo.nombre] || ''} 
+                          onChange={(e) => manejarCambioInput(campo.nombre, e.target.value)} 
+                          maxLength={campo.tipo === 'text' ? 50 : undefined} 
+                        />
                       )}
                     </div>
                   ))}
