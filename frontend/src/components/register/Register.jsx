@@ -19,7 +19,6 @@ const Register = ({ alIrALogin }) => {
     localStorage.setItem('collectorhub-tema', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
-  // --- FASE 1: REGISTRAR DATOS ---
   const manejarRegistro = async (e) => {
     e.preventDefault();
 

@@ -16,7 +16,7 @@ import java.util.Random;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://collector-hub-frontend.vercel.app/")
 public class AuthController {
 
     @Autowired
@@ -56,6 +56,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @jakarta.transaction.Transactional // Importante: Asegura que si algo falla, no se guarde nada
     public ResponseEntity<String> registrarUsuario(@RequestBody RegistroRequestDTO registroDTO) {
 
         String regexCorreo = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
@@ -70,7 +71,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Ya existe una cuenta con este correo.");
         }
 
-        // Pasamos los datos seguros del DTO a la Entidad real
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setAlias(registroDTO.getAlias());
         nuevoUsuario.setCorreoElectronico(registroDTO.getCorreoElectronico());
@@ -81,14 +81,15 @@ public class AuthController {
         String pinSeguridad = String.format("%06d", new Random().nextInt(1000000));
         nuevoUsuario.setCodigoVerificacion(pinSeguridad);
 
+        // Guardamos primero
         usuarioRepository.save(nuevoUsuario);
 
+        // Intentamos enviar el correo
         try {
             emailService.enviarCorreoPin(nuevoUsuario.getCorreoElectronico(), nuevoUsuario.getAlias(), pinSeguridad);
         } catch (Exception e) {
-            usuarioRepository.delete(nuevoUsuario);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: No pudimos enviar el correo.");
+            // LANZAMOS ERROR para que @Transactional haga el rollback (borre el usuario solo)
+            throw new RuntimeException("Error al enviar el correo: " + e.getMessage());
         }
 
         return ResponseEntity.ok("Registro guardado. Esperando PIN de verificacion.");
