@@ -28,7 +28,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // Quitamos la palabra "Bearer "
+            String token = authHeader.substring(7);
 
             if (jwtUtil.validarToken(token)) {
                 Claims claims = jwtUtil.extraerClaims(token);
