@@ -56,16 +56,24 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registrarUsuario(@RequestBody RegistroRequestDTO registroDTO) {
-        // 1. Validaciones de siempre
+    public ResponseEntity<String> registrarUsuario(@RequestBody RegistroRequestDTO registroDTO) {
+        // 1. Validación de Formatos
+        String regexCorreo = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+        String regexPassword = "^(?=.*[0-9])(?=.*[!@#$%^&*(),.?\":{}|<>]).{8,}$";
+
+        if (registroDTO.getCorreoElectronico() == null || !registroDTO.getCorreoElectronico().matches(regexCorreo)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Correo inválido.");
+        }
+        if (registroDTO.getPassword() == null || !registroDTO.getPassword().matches(regexPassword)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Contraseña poco segura (mínimo 8 caracteres, número y símbolo).");
+        }
+
+        // 2. Comprobación de duplicados
         if (usuarioRepository.findByAlias(registroDTO.getAlias()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: El alias ya está en uso.");
         }
-        if (usuarioRepository.comprobarSiExisteCorreo(registroDTO.getCorreoElectronico())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: El correo ya está en uso.");
-        }
 
-        // 2. Crear usuario
+        // 3. Crear y Guardar usuario temporal
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setAlias(registroDTO.getAlias());
         nuevoUsuario.setCorreoElectronico(registroDTO.getCorreoElectronico());
@@ -73,17 +81,22 @@ public class AuthController {
         nuevoUsuario.setRol("user");
         nuevoUsuario.setCuentaActiva(false);
 
-        String pinSeguridad = String.format("%06d", new java.util.Random().nextInt(1000000));
-        nuevoUsuario.setCodigoVerificacion(pinSeguridad);
+        String pin = String.format("%06d", new java.util.Random().nextInt(1000000));
+        nuevoUsuario.setCodigoVerificacion(pin);
 
-        // 3. Guardar en la DB
         usuarioRepository.save(nuevoUsuario);
 
-        // 4. Lanzar el mail (al ser @Async, esto no frena la respuesta)
-        emailService.enviarCorreoPin(nuevoUsuario.getCorreoElectronico(), nuevoUsuario.getAlias(), pinSeguridad);
+        // 4. Intentar envío
+        try {
+            emailService.enviarCorreoAPI(nuevoUsuario.getCorreoElectronico(), nuevoUsuario.getAlias(), pin);
+        } catch (Exception e) {
+            // SI FALLA EL ENVÍO, BORRAMOS EL USUARIO FANTASMA
+            usuarioRepository.delete(nuevoUsuario);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al enviar el correo. Inténtalo de nuevo en unos segundos.");
+        }
 
-        // 5. Responder YA a React
-        return ResponseEntity.ok("Te hemos enviado un código de 6 dígitos a tu correo.");
+        return ResponseEntity.ok("Registro guardado. Revisa tu email.");
     }
 
     @PostMapping("/verify-pin")

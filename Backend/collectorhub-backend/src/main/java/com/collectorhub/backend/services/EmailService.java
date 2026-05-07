@@ -1,29 +1,57 @@
 package com.collectorhub.backend.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+
+import org.springframework.http.HttpHeaders;
+
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+    // Pon aquí tus credenciales de EmailJS
+    private final String SERVICE_ID = "service_tavecfb";
+    private final String TEMPLATE_ID = "template_yg9kc5h";
+    private final String PUBLIC_KEY = "OG-5oIkZLJft-0ROe";
+    private final String PRIVATE_KEY = "VQkZZi1Fzrcz4v4vQUsNV";
 
     @Async
-    public void enviarCorreoPin(String correoDestino, String alias, String pin) {
-        SimpleMailMessage mensaje = new SimpleMailMessage();
-        mensaje.setTo(correoDestino);
-        mensaje.setSubject("🔑 Tu código de seguridad - CollectorHub");
+    public void enviarCorreoAPI(String emailDestino, String nombreUsuario, String pin) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://api.emailjs.com/api/v1.0/email/send";
 
-        mensaje.setText("Hola " + alias + ",\n\n"
-                + "Gracias por registrarte en CollectorHub. Para terminar de crear tu cuenta y comprobar que este correo es tuyo, introduce el siguiente código de 6 dígitos en la aplicación:\n\n"
-                + "CÓDIGO DE VERIFICACIÓN: " + pin + "\n\n"
-                + "Si no has sido tú, simplemente ignora este correo.\n\n"
-                + "El equipo de CollectorHub.");
+        // Preparamos los parámetros del template
+        Map<String, Object> templateParams = new HashMap<>();
+        templateParams.put("to_name", nombreUsuario);
+        templateParams.put("user_email", emailDestino);
+        templateParams.put("pin", pin);
 
-        mailSender.send(mensaje);
+        // Preparamos el cuerpo de la petición según la documentación de EmailJS
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("service_id", SERVICE_ID);
+        requestBody.put("template_id", TEMPLATE_ID);
+        requestBody.put("user_id", PUBLIC_KEY);
+        requestBody.put("accessToken", PRIVATE_KEY); // Requerido para llamadas desde el servidor
+        requestBody.put("template_params", templateParams);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+        try {
+            restTemplate.postForEntity(url, entity, String.class);
+            System.out.println("PIN enviado con éxito mediante EmailJS");
+        } catch (Exception e) {
+            System.err.println("Error en EmailJS: " + e.getMessage());
+            throw e;
+        }
     }
 }
