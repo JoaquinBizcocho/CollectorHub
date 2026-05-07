@@ -16,7 +16,7 @@ import java.util.Random;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "https://collector-hub-frontend.vercel.app/")
+@CrossOrigin(origins = "https://collector-hub-frontend.vercel.app")
 public class AuthController {
 
     @Autowired

@@ -10,7 +10,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins = "https://collector-hub-frontend.vercel.app/")
+@CrossOrigin(origins = "https://collector-hub-frontend.vercel.app")
 public class AdminController {
 
     @Autowired

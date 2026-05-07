@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/articulos")
-@CrossOrigin(origins = "https://collector-hub-frontend.vercel.app/")
+@CrossOrigin(origins = "https://collector-hub-frontend.vercel.app")
 public class ArticuloController {
 
     @Autowired

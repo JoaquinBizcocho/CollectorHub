@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/categorias")
-@CrossOrigin(origins = "https://collector-hub-frontend.vercel.app/")
+@CrossOrigin(origins = "https://collector-hub-frontend.vercel.app")
 public class CategoriaController {
 
     @Autowired
