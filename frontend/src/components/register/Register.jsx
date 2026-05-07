@@ -36,7 +36,7 @@ const Register = ({ alIrALogin }) => {
     }
 
     try {
-      const respuesta = await fetch('http://localhost:8080/api/auth/register', {
+      const respuesta = await fetch('https://collectorhub-z5z2.onrender.com/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ alias: alias, correoElectronico: correo, password: password })
@@ -59,7 +59,7 @@ const Register = ({ alIrALogin }) => {
   const manejarVerificacion = async (e) => {
     e.preventDefault();
     try {
-      const respuesta = await fetch('http://localhost:8080/api/auth/verify-pin', {
+      const respuesta = await fetch('https://collectorhub-z5z2.onrender.com/api/auth/verify-pin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ alias: alias, pin: pin })

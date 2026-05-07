@@ -55,7 +55,7 @@ const usuarioId = localStorage.getItem('usuarioId');
   const cargarArticulos = async () => {
     try {
       const token = localStorage.getItem('token'); 
-      const response = await fetch(`http://localhost:8080/api/articulos/categoria/${categoria.id}/usuario/${usuarioId}`, {
+      const response = await fetch(`https://collectorhub-z5z2.onrender.com/api/articulos/categoria/${categoria.id}/usuario/${usuarioId}`, {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + token 
@@ -144,7 +144,7 @@ const usuarioId = localStorage.getItem('usuarioId');
       const token = localStorage.getItem('token'); 
 
       try {
-        const response = await fetch(`http://localhost:8080/api/articulos/${id}`, { 
+        const response = await fetch(`https://collectorhub-z5z2.onrender.com/api/articulos/${id}`, { 
           method: 'DELETE',
           headers: {
             'Authorization': 'Bearer ' + token 
@@ -177,7 +177,7 @@ const usuarioId = localStorage.getItem('usuarioId');
     };
     
     const metodo = idEditando ? 'PUT' : 'POST';
-    const url = idEditando ? `http://localhost:8080/api/articulos/${idEditando}` : 'http://localhost:8080/api/articulos';
+    const url = idEditando ? `https://collectorhub-z5z2.onrender.com/api/articulos/${idEditando}` : 'https://collectorhub-z5z2.onrender.com/api/articulos';
     
     try {
       const token = localStorage.getItem('token');

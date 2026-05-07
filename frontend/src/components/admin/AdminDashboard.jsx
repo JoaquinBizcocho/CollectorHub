@@ -23,7 +23,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
       setCargandoStats(true);
       const token = localStorage.getItem('token');
 
-      const response = await fetch('http://localhost:8080/api/admin/estadisticas', {
+      const response = await fetch('https://collectorhub-z5z2.onrender.com/api/admin/estadisticas', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
     try {
       const token = localStorage.getItem('token'); 
 
-      const response = await fetch('http://localhost:8080/api/categorias/oficiales', {
+      const response = await fetch('https://collectorhub-z5z2.onrender.com/api/categorias/oficiales', {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + token
@@ -79,7 +79,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
     if (window.confirm("¿Borrar esta plantilla oficial?")) {
       const token = localStorage.getItem('token'); 
 
-      await fetch(`http://localhost:8080/api/categorias/${id}`, { 
+      await fetch(`https://collectorhub-z5z2.onrender.com/api/categorias/${id}`, { 
         method: 'DELETE',
         headers: {
           'Authorization': 'Bearer ' + token
@@ -104,7 +104,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
     try {
       const token = localStorage.getItem('token'); 
 
-      const response = await fetch('http://localhost:8080/api/categorias', {
+      const response = await fetch('https://collectorhub-z5z2.onrender.com/api/categorias', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

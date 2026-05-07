@@ -20,7 +20,7 @@ const manejarLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const respuesta = await fetch('http://localhost:8080/api/auth/login', {
+      const respuesta = await fetch('https://collectorhub-z5z2.onrender.com/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ alias: alias, password: password })

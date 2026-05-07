@@ -30,7 +30,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/categorias/usuario/${usuarioId}`, {
+      const response = await fetch(`https://collectorhub-z5z2.onrender.com/api/categorias/usuario/${usuarioId}`, {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + token 
@@ -48,7 +48,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
     const token = localStorage.getItem('token'); 
 
     try {
-      const response = await fetch('http://localhost:8080/api/categorias/oficiales', {
+      const response = await fetch('https://collectorhub-z5z2.onrender.com/api/categorias/oficiales', {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + token 
@@ -89,7 +89,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
       const token = localStorage.getItem('token'); 
 
       try {
-        const response = await fetch(`http://localhost:8080/api/categorias/${id}`, { 
+        const response = await fetch(`https://collectorhub-z5z2.onrender.com/api/categorias/${id}`, { 
           method: 'DELETE',
           headers: {
             'Authorization': 'Bearer ' + token 
@@ -116,7 +116,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
     try {
       const token = localStorage.getItem('token'); 
 
-      const response = await fetch('http://localhost:8080/api/categorias', {
+      const response = await fetch('https://collectorhub-z5z2.onrender.com/api/categorias', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -157,8 +157,8 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
 
     const metodo = idEditando ? 'PUT' : 'POST';
     const url = idEditando 
-      ? `http://localhost:8080/api/categorias/${idEditando}` 
-      : 'http://localhost:8080/api/categorias';
+      ? `https://collectorhub-z5z2.onrender.com/api/categorias/${idEditando}` 
+      : 'https://collectorhub-z5z2.onrender.com/api/categorias';
 
     try {
       const token = localStorage.getItem('token'); 
