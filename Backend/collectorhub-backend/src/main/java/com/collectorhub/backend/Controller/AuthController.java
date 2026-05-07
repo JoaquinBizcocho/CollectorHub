@@ -56,21 +56,16 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @jakarta.transaction.Transactional // Importante: Asegura que si algo falla, no se guarde nada
-    public ResponseEntity<String> registrarUsuario(@RequestBody RegistroRequestDTO registroDTO) {
-
-        String regexCorreo = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
-        if (registroDTO.getCorreoElectronico() == null || !registroDTO.getCorreoElectronico().matches(regexCorreo)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: El formato del correo no es valido.");
-        }
-
+    public ResponseEntity<?> registrarUsuario(@RequestBody RegistroRequestDTO registroDTO) {
+        // 1. Validaciones de siempre
         if (usuarioRepository.findByAlias(registroDTO.getAlias()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: El alias ya esta en uso.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: El alias ya está en uso.");
         }
         if (usuarioRepository.comprobarSiExisteCorreo(registroDTO.getCorreoElectronico())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Ya existe una cuenta con este correo.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: El correo ya está en uso.");
         }
 
+        // 2. Crear usuario
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setAlias(registroDTO.getAlias());
         nuevoUsuario.setCorreoElectronico(registroDTO.getCorreoElectronico());
@@ -78,21 +73,17 @@ public class AuthController {
         nuevoUsuario.setRol("user");
         nuevoUsuario.setCuentaActiva(false);
 
-        String pinSeguridad = String.format("%06d", new Random().nextInt(1000000));
+        String pinSeguridad = String.format("%06d", new java.util.Random().nextInt(1000000));
         nuevoUsuario.setCodigoVerificacion(pinSeguridad);
 
-        // Guardamos primero
+        // 3. Guardar en la DB
         usuarioRepository.save(nuevoUsuario);
 
-        // Intentamos enviar el correo
-        try {
-            emailService.enviarCorreoPin(nuevoUsuario.getCorreoElectronico(), nuevoUsuario.getAlias(), pinSeguridad);
-        } catch (Exception e) {
-            // LANZAMOS ERROR para que @Transactional haga el rollback (borre el usuario solo)
-            throw new RuntimeException("Error al enviar el correo: " + e.getMessage());
-        }
+        // 4. Lanzar el mail (al ser @Async, esto no frena la respuesta)
+        emailService.enviarCorreoPin(nuevoUsuario.getCorreoElectronico(), nuevoUsuario.getAlias(), pinSeguridad);
 
-        return ResponseEntity.ok("Registro guardado. Esperando PIN de verificacion.");
+        // 5. Responder YA a React
+        return ResponseEntity.ok("Te hemos enviado un código de 6 dígitos a tu correo.");
     }
 
     @PostMapping("/verify-pin")
