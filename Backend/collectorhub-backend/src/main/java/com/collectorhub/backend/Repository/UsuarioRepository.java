@@ -20,5 +20,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     boolean comprobarSiExisteCorreo(String correo);
 
     // busca cuentas no verificadas cuyo registro expiró
-    List<Usuario> buscaCuentaInactiva(LocalDateTime fechaLimite);
+    @Query("SELECT u FROM Usuario u WHERE u.cuentaActiva = false AND u.fechaRegistro < ?1")
+    List<Usuario> buscarCuentasExpiradas(LocalDateTime fechaLimite);
 }

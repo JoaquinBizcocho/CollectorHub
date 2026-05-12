@@ -171,7 +171,7 @@ public class AuthController {
     public void limpiarCuentasNoVerificadas() {
         LocalDateTime hace5Minutos = LocalDateTime.now().minusMinutes(5);
         List<Usuario> expirados = usuarioRepository
-                .buscaCuentaInactiva(hace5Minutos);
+                .buscarCuentasExpiradas(hace4Minutos);
 
         if (!expirados.isEmpty()) {
             usuarioRepository.deleteAll(expirados);
