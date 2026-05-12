@@ -15,7 +15,7 @@ public class CategoriaDTO {
     @Size(max = 50, message = "El nombre no puede superar los 50 caracteres")
     private String nombre;
 
-    @Size(max = 255, message = "La descripcion no puede superar los 255 caracteres")
+    @Size(max = 1000, message = "La descripcion no puede superar los 1000 caracteres")
     private String descripcion;
 
     private Integer usuarioId;

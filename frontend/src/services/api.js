@@ -18,9 +18,8 @@ const cerrarSesionAutomatico = () => {
 
 const fetchConAuth = async (url, opciones = {}) => {
   const response = await fetch(url, opciones);
-  if (response.status === 401 || response.status === 403) {
+  if (response.status === 401) {
     cerrarSesionAutomatico();
-    return response;
   }
   return response;
 };
