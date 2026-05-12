@@ -34,12 +34,15 @@ public class JwtFilter extends OncePerRequestFilter {
                 Claims claims = jwtUtil.extraerClaims(token);
                 String alias = claims.getSubject();
                 String rol = claims.get("rol", String.class);
+                Integer usuarioId = claims.get("id", Integer.class);
 
-                // Convertimos tu rol de BD en el formato que Spring Security entiende
                 String roleGranted = (rol != null && rol.contains("admin")) ? "ROLE_ADMIN" : "ROLE_USER";
 
+                // Guardamos el usuario autenticado completo (con id) como principal
+                AuthenticatedUser principal = new AuthenticatedUser(usuarioId, alias, rol);
+
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        alias, null, Collections.singletonList(new SimpleGrantedAuthority(roleGranted)));
+                        principal, null, Collections.singletonList(new SimpleGrantedAuthority(roleGranted)));
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }

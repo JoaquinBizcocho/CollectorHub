@@ -30,7 +30,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
     }
 
     try {
-      const response = await fetch(`https://collectorhub-z5z2.onrender.com/api/categorias/usuario/${usuarioId}`, {
+      const response = await fetch(`https://collectorhub-z5z2.onrender.com/api/categorias/usuario`, {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + token 

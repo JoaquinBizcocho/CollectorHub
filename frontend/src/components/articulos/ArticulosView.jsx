@@ -53,7 +53,7 @@ const usuarioId = localStorage.getItem('usuarioId');
   const cargarArticulos = async () => {
     try {
       const token = localStorage.getItem('token'); 
-      const response = await fetch(`https://collectorhub-z5z2.onrender.com/api/articulos/categoria/${categoria.id}/usuario/${usuarioId}`, {
+      const response = await fetch(`https://collectorhub-z5z2.onrender.com/api/articulos/categoria/${categoria.id}`, {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + token 
