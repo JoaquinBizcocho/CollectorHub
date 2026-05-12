@@ -183,7 +183,6 @@ const usuarioId = localStorage.getItem('usuarioId');
       alert(`Por favor, rellena todos los campos obligatorios. Te falta: ${camposFaltantes.join(', ')}`);
       return; 
     }
-    // -----------------------------------------
     
     const articuloGuardar = {
       id: idEditando, 
@@ -308,8 +307,11 @@ const usuarioId = localStorage.getItem('usuarioId');
                 </div>
                 <div className="zona-imagenes">
                   <h4>Imagenes (Max. 2)</h4>
-                  <input type="file" accept="image/*" multiple onChange={manejarSubidaImagen} disabled={imagenes.length >= 2} className="input-file" />
-                  <div className="imagenes-preview-container">
+                    <label className="btn-subir-imagen">
+                      Añadir imagen
+                      <input type="file" accept="image/*" multiple onChange={manejarSubidaImagen} disabled={imagenes.length >= 2} style={{ display: 'none' }} />
+                    </label>                  
+                    <div className="imagenes-preview-container">
                     {imagenes.map((img, idx) => (
                       <div key={idx} className="miniatura-wrapper">
                         <img src={img} alt={`Preview ${idx}`} className="miniatura-img" />

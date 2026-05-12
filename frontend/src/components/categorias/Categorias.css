@@ -308,12 +308,12 @@ textarea.input-base {
 .btn-volver {
   background-color: transparent;
   color: white;
-  border: 2px solid white; /* Añadimos el borde igual que cerrar sesión */
-  padding: 8px 16px;       /* Mismo padding para que midan igual de alto */
-  border-radius: 8px;      /* Esquinas redondeadas */
+  border: 2px solid white; 
+  padding: 8px 16px;      
+  border-radius: 8px;     
   font-weight: bold;
   cursor: pointer;
-  text-decoration: none;   /* Le quitamos el subrayado feo */
+  text-decoration: none;   
   transition: all 0.3s ease;
 }
 
@@ -353,6 +353,25 @@ textarea.input-base {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.btn-subir-imagen {
+  display: inline-block;
+  padding: 10px 18px;
+  background-color: var(--bg-input);
+  border: 1px dashed #66bb6a;
+  border-radius: 8px;
+  color: var(--texto-input);
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.btn-subir-imagen:hover {
+  background-color: #66bb6a22;
+  transform: translateY(-2px);
 }
 
 .articulo-sin-imagen {

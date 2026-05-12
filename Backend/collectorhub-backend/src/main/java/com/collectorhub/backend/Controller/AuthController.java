@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import java.security.SecureRandom;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,9 +36,8 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // ─────────────────────────────────────────────
     // LOGIN
-    // ─────────────────────────────────────────────
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO credenciales) {
         Optional<Usuario> optionalUser = usuarioRepository.findByAlias(credenciales.getAlias());
@@ -63,9 +63,9 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas.");
     }
 
-    // ─────────────────────────────────────────────
+
     // REGISTRO
-    // ─────────────────────────────────────────────
+
     @PostMapping("/register")
     public ResponseEntity<String> registrarUsuario(@RequestBody RegistroRequestDTO registroDTO) {
 
@@ -100,10 +100,10 @@ public class AuthController {
         nuevoUsuario.setPassword(passwordEncoder.encode(registroDTO.getPassword()));
         nuevoUsuario.setRol("user");
         nuevoUsuario.setCuentaActiva(false);
-        nuevoUsuario.setFechaRegistro(LocalDateTime.now()); // marca de tiempo para el scheduler
-        nuevoUsuario.setIntentosFallidos(0);               // contador de intentos a 0
+        nuevoUsuario.setFechaRegistro(LocalDateTime.now());
+        nuevoUsuario.setIntentosFallidos(0);
 
-        String pin = String.format("%06d", new java.util.Random().nextInt(1000000));
+        String pin = String.format("%06d", new SecureRandom().nextInt(1000000));
         nuevoUsuario.setCodigoVerificacion(pin);
 
         usuarioRepository.save(nuevoUsuario);
@@ -120,9 +120,9 @@ public class AuthController {
         return ResponseEntity.ok("Registro guardado. Revisa tu email para obtener el PIN (caduca en 5 minutos).");
     }
 
-    // ─────────────────────────────────────────────
+
     // VERIFICACIÓN DE PIN
-    // ─────────────────────────────────────────────
+
     @PostMapping("/verify-pin")
     public ResponseEntity<String> verificarPin(@RequestBody PinRequestDTO datos) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findByAlias(datos.getAlias());
