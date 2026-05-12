@@ -4,6 +4,7 @@ import com.collectorhub.backend.DTO.CategoriaDTO;
 import com.collectorhub.backend.Entidades.Categoria;
 import com.collectorhub.backend.Repository.CategoriaRepository;
 import com.collectorhub.backend.security.AuthenticatedUser;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class CategoriaController {
     }
 
     @PostMapping
-    public ResponseEntity<Categoria> crearCategoria(@RequestBody CategoriaDTO dto, Authentication authentication) {
+    public ResponseEntity<Categoria> crearCategoria(@Valid @RequestBody CategoriaDTO dto, Authentication authentication) {
         AuthenticatedUser usuario = (AuthenticatedUser) authentication.getPrincipal();
 
         Categoria categoria = new Categoria();
@@ -48,7 +49,7 @@ public class CategoriaController {
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarCategoria(
             @PathVariable Integer id,
-            @RequestBody CategoriaDTO dto,
+            @Valid @RequestBody CategoriaDTO dto,
             Authentication authentication) {
 
         AuthenticatedUser usuario = (AuthenticatedUser) authentication.getPrincipal();

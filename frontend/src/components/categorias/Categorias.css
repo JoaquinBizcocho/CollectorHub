@@ -725,9 +725,7 @@ textarea.input-base {
   100% { opacity: 0.3; }
 }
 
-/* =========================================
-   RESPONSIVE DESIGN - MOBILE (Añadido al final)
-   ========================================= */
+
 @media (max-width: 768px) {
   /* 1. Cabecera superior */
   .dashboard-topbar {
@@ -767,7 +765,7 @@ textarea.input-base {
     box-shadow: 0 5px 15px var(--sombra) !important; /* Mantiene la sombra original sin crecer */
     border-left: none !important; /* Quita la raya verde */
   }
-  /* --------------------------------------------------- */
+  
 
   .categoria-acciones {
     width: 100%;

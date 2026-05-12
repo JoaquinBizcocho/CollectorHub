@@ -4,6 +4,7 @@ import com.collectorhub.backend.DTO.ArticuloDTO;
 import com.collectorhub.backend.Entidades.Articulo;
 import com.collectorhub.backend.Repository.ArticuloRepository;
 import com.collectorhub.backend.security.AuthenticatedUser;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class ArticuloController {
     }
 
     @PostMapping
-    public ResponseEntity<Articulo> crearArticulo(@RequestBody ArticuloDTO dto, Authentication authentication) {
+    public ResponseEntity<Articulo> crearArticulo(@Valid @RequestBody ArticuloDTO dto, Authentication authentication) {
         AuthenticatedUser usuario = (AuthenticatedUser) authentication.getPrincipal();
 
         Articulo articulo = new Articulo();
@@ -48,7 +49,7 @@ public class ArticuloController {
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarArticulo(
             @PathVariable Integer id,
-            @RequestBody ArticuloDTO dto,
+            @Valid @RequestBody ArticuloDTO dto,
             Authentication authentication) {
 
         AuthenticatedUser usuario = (AuthenticatedUser) authentication.getPrincipal();
