@@ -1,6 +1,7 @@
 package com.collectorhub.backend.Entidades;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usuarios")
@@ -28,6 +29,15 @@ public class Usuario {
     @Column(length = 6)
     private String codigoVerificacion; // Aquí guardamos el PIN temporal
 
+    // para el scheduler de 5 minutos
+    @Column
+    private LocalDateTime fechaRegistro;
+
+    // para limitar intentos de PIN
+    @Column(nullable = false)
+    private int intentosFallidos = 0;
+
+
     public Usuario() {}
 
     // --- GETTERS Y SETTERS ---
@@ -52,4 +62,10 @@ public class Usuario {
 
     public String getCodigoVerificacion() { return codigoVerificacion; }
     public void setCodigoVerificacion(String codigoVerificacion) { this.codigoVerificacion = codigoVerificacion; }
+
+    public LocalDateTime getFechaRegistro() { return fechaRegistro; }
+    public void setFechaRegistro(LocalDateTime fechaRegistro) { this.fechaRegistro = fechaRegistro; }
+
+    public int getIntentosFallidos() { return intentosFallidos; }
+    public void setIntentosFallidos(int intentosFallidos) { this.intentosFallidos = intentosFallidos; }
 }
