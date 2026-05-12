@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import '../categorias/Categorias.css'; 
+import '../categorias/Categorias.css';
+import { categoriasApi, adminApi } from '../../services/api';
 
 const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
   const [estadisticas, setEstadisticas] = useState({ totalUsuarios: 0, totalCategorias: 0, totalArticulos: 0 });
@@ -10,9 +11,6 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
   const [esquema, setEsquema] = useState([{ nombre: '', tipo: 'text' }]);
   const [cargandoStats, setCargandoStats] = useState(true);
 
-  
-  const usuarioId = localStorage.getItem('usuarioId');
-
   useEffect(() => {
     cargarEstadisticas();
     cargarPlantillas();
@@ -21,50 +19,27 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
   const cargarEstadisticas = async () => {
     try {
       setCargandoStats(true);
-      const token = localStorage.getItem('token');
-
-      const response = await fetch('https://collectorhub-z5z2.onrender.com/api/admin/estadisticas', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token 
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setEstadisticas(data);
-      } else {
-        console.error("Acceso denegado. Revisa si el token es de un ADMIN.");
-      }
+      const response = await adminApi.getEstadisticas();
+      if (response.ok) setEstadisticas(await response.json());
+      else console.error("Acceso denegado. Revisa si el token es de un ADMIN.");
     } catch (error) {
       console.error("Error al cargar estadisticas", error);
     } finally {
-      setCargandoStats(false); 
+      setCargandoStats(false);
     }
-  }
+  };
 
   const cargarPlantillas = async () => {
     try {
-      const token = localStorage.getItem('token'); 
-
-      const response = await fetch('https://collectorhub-z5z2.onrender.com/api/categorias/oficiales', {
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer ' + token
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setPlantillas(data);
-      }
+      const response = await categoriasApi.getOficiales();
+      if (response.ok) setPlantillas(await response.json());
     } catch (error) {
       console.error("Error al cargar plantillas", error);
     }
   };
 
   const agregarCampoEsquema = () => setEsquema([...esquema, { nombre: '', tipo: 'text' }]);
-  
+
   const actualizarCampoEsquema = (index, campo, valor) => {
     const nuevoEsquema = [...esquema];
     nuevoEsquema[index][campo] = valor;
@@ -77,14 +52,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
 
   const borrarPlantilla = async (id) => {
     if (window.confirm("¿Borrar esta plantilla oficial?")) {
-      const token = localStorage.getItem('token'); 
-
-      await fetch(`https://collectorhub-z5z2.onrender.com/api/categorias/${id}`, { 
-        method: 'DELETE',
-        headers: {
-          'Authorization': 'Bearer ' + token
-        }
-      });
+      await categoriasApi.eliminar(id);
       cargarPlantillas();
     }
   };
@@ -92,27 +60,9 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
   const guardarPlantilla = async (e) => {
     e.preventDefault();
     const esquemaLimpio = esquema.filter(campo => campo.nombre.trim() !== '');
-    
-    const nuevaPlantilla = {
-      nombre,
-      descripcion,
-      esquema: esquemaLimpio,
-      usuarioId: parseInt(usuarioId),
-      esOficial: true 
-    };
-
+    const nuevaPlantilla = { nombre, descripcion, esquema: esquemaLimpio, esOficial: true };
     try {
-      const token = localStorage.getItem('token'); 
-
-      const response = await fetch('https://collectorhub-z5z2.onrender.com/api/categorias', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token
-        },
-        body: JSON.stringify(nuevaPlantilla)
-      });
-
+      const response = await categoriasApi.crear(nuevaPlantilla);
       if (response.ok) {
         cargarPlantillas();
         cargarEstadisticas();
@@ -129,7 +79,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
   return (
     <div className="dashboard-wrapper">
       <header className="dashboard-topbar" style={{backgroundColor: '#333'}}>
-        <h1 className="logo-text" style={{color: '#ffb300'}}>ADMIN </h1>
+        <h1 className="logo-text" style={{color: '#ffb300'}}>ADMIN</h1>
         <div className="topbar-actions">
           <button className="btn-volver" onClick={alVolver}>Volver a Mis categorias</button>
           <button className="btn-cerrar-sesion" onClick={alCerrarSesion}>Cerrar Sesión</button>
@@ -137,7 +87,6 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
       </header>
 
       <div className="dashboard-container">
-        
         <h3 className="section-title" style={{ marginTop: '0', marginBottom: '20px' }}>Métricas Globales</h3>
         <div className="estadisticas-grid">
           <div className="estadistica-card">
@@ -219,7 +168,6 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

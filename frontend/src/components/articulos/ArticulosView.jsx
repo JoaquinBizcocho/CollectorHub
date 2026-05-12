@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import '../categorias/Categorias.css';
+import { articulosApi } from '../../services/api';
 
 const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
   const [indice, setIndice] = useState(0);
@@ -11,7 +12,6 @@ const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
       const temporizador = setInterval(() => {
         setIndice(prev => (prev + 1) % imagenesValidas.length);
       }, 5000);
-      
       return () => clearInterval(temporizador);
     }
   }, [imagenesValidas.length]);
@@ -36,7 +36,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [idEditando, setIdEditando] = useState(null);
   const [datosFormulario, setDatosFormulario] = useState({});
-  const [imagenes, setImagenes] = useState([]); 
+  const [imagenes, setImagenes] = useState([]);
 
   const [lightbox, setLightbox] = useState({ 
     activo: false, 
@@ -44,36 +44,21 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     indiceActual: 0 
   });
 
-const usuarioId = localStorage.getItem('usuarioId');
-
   useEffect(() => {
     cargarArticulos();
   }, [categoria]);
 
   const cargarArticulos = async () => {
     try {
-      const token = localStorage.getItem('token'); 
-      const response = await fetch(`https://collectorhub-z5z2.onrender.com/api/articulos/categoria/${categoria.id}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer ' + token 
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setArticulos(data);
-      }
+      const response = await articulosApi.getByCategoria(categoria.id);
+      if (response.ok) setArticulos(await response.json());
     } catch (error) {
       console.error("Error al cargar articulos", error);
     }
   };
 
   const abrirLightbox = (imagenesLista, indexClicado) => {
-    setLightbox({
-      activo: true,
-      listaImagenes: imagenesLista,
-      indiceActual: indexClicado
-    });
+    setLightbox({ activo: true, listaImagenes: imagenesLista, indiceActual: indexClicado });
   };
 
   const cerrarLightbox = () => {
@@ -81,7 +66,7 @@ const usuarioId = localStorage.getItem('usuarioId');
   };
 
   const fotoSiguiente = (e) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     setLightbox(prev => ({
       ...prev,
       indiceActual: (prev.indiceActual + 1) % prev.listaImagenes.length
@@ -136,19 +121,10 @@ const usuarioId = localStorage.getItem('usuarioId');
     setMostrarModal(true);
   };
 
- const borrarArticulo = async (id) => {
+  const borrarArticulo = async (id) => {
     if (window.confirm("¿Estás seguro de que quieres borrar este artículo?")) {
-      
-      const token = localStorage.getItem('token'); 
-
       try {
-        const response = await fetch(`https://collectorhub-z5z2.onrender.com/api/articulos/${id}`, { 
-          method: 'DELETE',
-          headers: {
-            'Authorization': 'Bearer ' + token 
-          }
-        });
-
+        const response = await articulosApi.eliminar(id);
         if (response.ok) {
           cargarArticulos();
         } else {
@@ -164,61 +140,45 @@ const usuarioId = localStorage.getItem('usuarioId');
 
   const guardarArticulo = async (e) => {
     e.preventDefault();
-    
-    let hayCamposVacios = false;
-    const camposFaltantes = [];
 
+    const camposFaltantes = [];
     if (categoria.esquema) {
       categoria.esquema.forEach((campo) => {
         const valor = datosFormulario[campo.nombre];
-        
         if (valor === undefined || valor === null || String(valor).trim() === "") {
-          hayCamposVacios = true;
           camposFaltantes.push(campo.nombre);
         }
       });
     }
 
-    if (hayCamposVacios) {
+    if (camposFaltantes.length > 0) {
       alert(`Por favor, rellena todos los campos obligatorios. Te falta: ${camposFaltantes.join(', ')}`);
-      return; 
+      return;
     }
-    
+
     const articuloGuardar = {
-      id: idEditando, 
       categoriaId: categoria.id,
-      usuarioId: parseInt(usuarioId),
       datos: datosFormulario,
       imagen1: imagenes[0] || null,
       imagen2: imagenes[1] || null
     };
-    
-    const metodo = idEditando ? 'PUT' : 'POST';
-    const url = idEditando ? `https://collectorhub-z5z2.onrender.com/api/articulos/${idEditando}` : 'https://collectorhub-z5z2.onrender.com/api/articulos';
-    
-    try {
-      const token = localStorage.getItem('token');
 
-      const response = await fetch(url, {
-        method: metodo, 
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token 
-        },
-        body: JSON.stringify(articuloGuardar) 
-      });
+    try {
+      const response = idEditando
+        ? await articulosApi.actualizar(idEditando, articuloGuardar)
+        : await articulosApi.crear(articuloGuardar);
 
       if (response.ok) {
-        cargarArticulos(); 
+        cargarArticulos();
         setMostrarModal(false);
-        setIdEditando(null); 
+        setIdEditando(null);
       } else {
         alert("Error de permisos: El servidor rechazó la operación.");
       }
     } catch (error) {
       console.error("Error al guardar", error);
     }
-  }
+  };
 
   return (
     <div className="dashboard-wrapper">
@@ -261,13 +221,13 @@ const usuarioId = localStorage.getItem('usuarioId');
                       <span className="dato-etiqueta">{campo.nombre}: </span>
                       <span className="dato-valor">
                         {art.datos && art.datos[campo.nombre] !== undefined && art.datos[campo.nombre] !== null && art.datos[campo.nombre] !== ''
-                          ? (campo.tipo === 'boolean' ? (art.datos[campo.nombre] ? 'Si' : 'No') : art.datos[campo.nombre]) 
+                          ? (campo.tipo === 'boolean' ? (art.datos[campo.nombre] ? 'Si' : 'No') : art.datos[campo.nombre])
                           : '-'}
                       </span>
                     </div>
                   ))}
                 </div>
-                
+
                 <div className="articulo-acciones-vertical">
                   <button className="btn-icon-text" onClick={() => abrirEdicion(art)}>Editar</button>
                   <button className="btn-icon-text peligro" onClick={() => borrarArticulo(art.id)}>Eliminar</button>
@@ -287,31 +247,36 @@ const usuarioId = localStorage.getItem('usuarioId');
                     <div key={index} className="campo-dinamico">
                       <label>{campo.nombre}</label>
                       {campo.tipo === 'boolean' ? (
-                        <select className="input-base" value={datosFormulario[campo.nombre] !== undefined ? datosFormulario[campo.nombre] : ''} onChange={(e) => manejarCambioInput(campo.nombre, e.target.value === 'true' ? true : e.target.value === 'false' ? false : '')}>
+                        <select
+                          className="input-base"
+                          value={datosFormulario[campo.nombre] !== undefined ? datosFormulario[campo.nombre] : ''}
+                          onChange={(e) => manejarCambioInput(campo.nombre, e.target.value === 'true' ? true : e.target.value === 'false' ? false : '')}
+                        >
                           <option value="">Selecciona...</option>
                           <option value="true">Si</option>
                           <option value="false">No</option>
                         </select>
                       ) : (
-                        <input 
-                          type={campo.tipo === 'number' ? 'number' : campo.tipo === 'date' ? 'date' : 'text'} 
-                          className="input-base" 
-                          placeholder={`Introduce ${campo.nombre}`} 
-                          value={datosFormulario[campo.nombre] || ''} 
-                          onChange={(e) => manejarCambioInput(campo.nombre, e.target.value)} 
-                          maxLength={campo.tipo === 'text' ? 50 : undefined} 
+                        <input
+                          type={campo.tipo === 'number' ? 'number' : campo.tipo === 'date' ? 'date' : 'text'}
+                          className="input-base"
+                          placeholder={`Introduce ${campo.nombre}`}
+                          value={datosFormulario[campo.nombre] || ''}
+                          onChange={(e) => manejarCambioInput(campo.nombre, e.target.value)}
+                          maxLength={campo.tipo === 'text' ? 50 : undefined}
                         />
                       )}
                     </div>
                   ))}
                 </div>
+
                 <div className="zona-imagenes">
                   <h4>Imagenes (Max. 2)</h4>
-                    <label className="btn-subir-imagen">
-                      Añadir imagen
-                      <input type="file" accept="image/*" multiple onChange={manejarSubidaImagen} disabled={imagenes.length >= 2} style={{ display: 'none' }} />
-                    </label>                  
-                    <div className="imagenes-preview-container">
+                  <label className="btn-subir-imagen">
+                    📷 Añadir imagen
+                    <input type="file" accept="image/*" multiple onChange={manejarSubidaImagen} disabled={imagenes.length >= 2} style={{ display: 'none' }} />
+                  </label>
+                  <div className="imagenes-preview-container">
                     {imagenes.map((img, idx) => (
                       <div key={idx} className="miniatura-wrapper">
                         <img src={img} alt={`Preview ${idx}`} className="miniatura-img" />
@@ -320,6 +285,7 @@ const usuarioId = localStorage.getItem('usuarioId');
                     ))}
                   </div>
                 </div>
+
                 <div className="modal-actions">
                   <button type="button" className="btn-cancelar" onClick={() => setMostrarModal(false)}>Cancelar</button>
                   <button type="submit" className="btn-guardar">{idEditando ? 'Actualizar' : 'Guardar'}</button>
@@ -329,27 +295,24 @@ const usuarioId = localStorage.getItem('usuarioId');
           </div>
         )}
 
-        {/* --- FLECHAS DE NAVEGACION --- */}
         {lightbox.activo && (
           <div className="lightbox-overlay" onClick={cerrarLightbox}>
             <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
               <button className="btn-close-lightbox" onClick={cerrarLightbox}>X</button>
-              
-              {/* Boton Izquierda */}
+
               {lightbox.listaImagenes.length > 1 && (
                 <button className="btn-flecha-lightbox izq" onClick={fotoAnterior}>
                   &#10094;
                 </button>
               )}
 
-              <img 
+              <img
                 key={lightbox.indiceActual}
-                src={lightbox.listaImagenes[lightbox.indiceActual]} 
-                alt="Imagen agrandada" 
-                className="lightbox-img animacion-fade" 
+                src={lightbox.listaImagenes[lightbox.indiceActual]}
+                alt="Imagen agrandada"
+                className="lightbox-img animacion-fade"
               />
 
-              {/* Boton Derecha */}
               {lightbox.listaImagenes.length > 1 && (
                 <button className="btn-flecha-lightbox der" onClick={fotoSiguiente}>
                   &#10095;
@@ -358,7 +321,6 @@ const usuarioId = localStorage.getItem('usuarioId');
             </div>
           </div>
         )}
-
       </div>
     </div>
   );
