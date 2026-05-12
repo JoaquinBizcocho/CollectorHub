@@ -2,6 +2,29 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const getToken = () => localStorage.getItem('token');
 
+let onSesionExpirada = null;
+
+export const setSesionExpiradaCallback = (callback) => {
+  onSesionExpirada = callback;
+};
+
+const cerrarSesionAutomatico = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('usuarioId');
+  localStorage.removeItem('alias');
+  localStorage.removeItem('rol');
+  if (onSesionExpirada) onSesionExpirada();
+};
+
+const fetchConAuth = async (url, opciones = {}) => {
+  const response = await fetch(url, opciones);
+  if (response.status === 401 || response.status === 403) {
+    cerrarSesionAutomatico();
+    return response;
+  }
+  return response;
+};
+
 const headers = (conBody = false) => ({
   ...(conBody && { 'Content-Type': 'application/json' }),
   'Authorization': 'Bearer ' + getToken()
@@ -9,27 +32,27 @@ const headers = (conBody = false) => ({
 
 export const categoriasApi = {
   getByUsuario: () =>
-    fetch(`${API_BASE}/api/categorias/usuario`, { headers: headers() }),
+    fetchConAuth(`${API_BASE}/api/categorias/usuario`, { headers: headers() }),
 
   getOficiales: () =>
-    fetch(`${API_BASE}/api/categorias/oficiales`, { headers: headers() }),
+    fetchConAuth(`${API_BASE}/api/categorias/oficiales`, { headers: headers() }),
 
   crear: (data) =>
-    fetch(`${API_BASE}/api/categorias`, {
+    fetchConAuth(`${API_BASE}/api/categorias`, {
       method: 'POST',
       headers: headers(true),
       body: JSON.stringify(data)
     }),
 
   actualizar: (id, data) =>
-    fetch(`${API_BASE}/api/categorias/${id}`, {
+    fetchConAuth(`${API_BASE}/api/categorias/${id}`, {
       method: 'PUT',
       headers: headers(true),
       body: JSON.stringify(data)
     }),
 
   eliminar: (id) =>
-    fetch(`${API_BASE}/api/categorias/${id}`, {
+    fetchConAuth(`${API_BASE}/api/categorias/${id}`, {
       method: 'DELETE',
       headers: headers()
     })
@@ -37,24 +60,24 @@ export const categoriasApi = {
 
 export const articulosApi = {
   getByCategoria: (categoriaId) =>
-    fetch(`${API_BASE}/api/articulos/categoria/${categoriaId}`, { headers: headers() }),
+    fetchConAuth(`${API_BASE}/api/articulos/categoria/${categoriaId}`, { headers: headers() }),
 
   crear: (data) =>
-    fetch(`${API_BASE}/api/articulos`, {
+    fetchConAuth(`${API_BASE}/api/articulos`, {
       method: 'POST',
       headers: headers(true),
       body: JSON.stringify(data)
     }),
 
   actualizar: (id, data) =>
-    fetch(`${API_BASE}/api/articulos/${id}`, {
+    fetchConAuth(`${API_BASE}/api/articulos/${id}`, {
       method: 'PUT',
       headers: headers(true),
       body: JSON.stringify(data)
     }),
 
   eliminar: (id) =>
-    fetch(`${API_BASE}/api/articulos/${id}`, {
+    fetchConAuth(`${API_BASE}/api/articulos/${id}`, {
       method: 'DELETE',
       headers: headers()
     })
@@ -62,5 +85,5 @@ export const articulosApi = {
 
 export const adminApi = {
   getEstadisticas: () =>
-    fetch(`${API_BASE}/api/admin/estadisticas`, { headers: headers() })
+    fetchConAuth(`${API_BASE}/api/admin/estadisticas`, { headers: headers() })
 };

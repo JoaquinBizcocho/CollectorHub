@@ -132,6 +132,19 @@
   background-color: #1e3325;
   color: #e8f5e9;
 }
+
+.register-submit-btn:disabled {
+  background-color: #9e9e9e;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.register-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* =========================================
    RESPONSIVE DESIGN - MOBILE (Añadido al final)
    ========================================= */

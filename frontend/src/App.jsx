@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Login from './components/login/Login'; 
 import Register from './components/register/Register';
 import CategoriasDashboard from './components/categorias/CategoriaDashboard';
 import ArticulosView from './components/articulos/ArticulosView';
 import AdminDashboard from './components/admin/AdminDashboard'; 
+import { setSesionExpiradaCallback } from './services/api';
 import "./App.css"
 
 function App() {
@@ -23,6 +24,15 @@ function App() {
     setCategoriaSeleccionada(null);
     setVistaActual('login');
   };
+
+
+  useEffect(() => {
+    setSesionExpiradaCallback(() => {
+      setCategoriaSeleccionada(null);
+      setVistaActual('login');
+      alert('Tu sesión ha expirado. Por favor, inicia sesión de nuevo.');
+    });
+  }, []);
 
   return (
     <main className={vistaActual === 'login' || vistaActual === 'register' ? "main-layout" : ""}>
