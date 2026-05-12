@@ -135,7 +135,7 @@ public class AuthController {
 
         // Comprobar si el PIN ya expiró (cuenta eliminada por scheduler o fecha pasada)
         if (u.getFechaRegistro() != null &&
-                u.getFechaRegistro().plusMinutes(4).isBefore(LocalDateTime.now())) {
+                u.getFechaRegistro().plusMinutes(5).isBefore(LocalDateTime.now())) {
             usuarioRepository.delete(u);
             return ResponseEntity.status(HttpStatus.GONE)
                     .body("El PIN ha caducado. Tu registro ha sido eliminado. Vuelve a registrarte.");
@@ -171,7 +171,7 @@ public class AuthController {
     public void limpiarCuentasNoVerificadas() {
         LocalDateTime hace5Minutos = LocalDateTime.now().minusMinutes(5);
         List<Usuario> expirados = usuarioRepository
-                .buscarCuentasExpiradas(hace4Minutos);
+                .buscarCuentasExpiradas(hace5Minutos);
 
         if (!expirados.isEmpty()) {
             usuarioRepository.deleteAll(expirados);
