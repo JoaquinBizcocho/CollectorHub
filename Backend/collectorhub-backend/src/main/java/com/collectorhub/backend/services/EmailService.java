@@ -1,5 +1,6 @@
 package com.collectorhub.backend.services;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -13,10 +14,17 @@ import java.util.Map;
 @Service
 public class EmailService {
 
-    private final String SERVICE_ID = "service_tavecfb";
-    private final String TEMPLATE_ID = "template_yg9kc5h";
-    private final String PUBLIC_KEY = "OG-5oIkZLJft-0ROe";
-    private final String PRIVATE_KEY = "VQkZZi1Fzrcz4v4vQUsNV";
+    @Value("${emailjs.service-id}")
+    private String SERVICE_ID;
+
+    @Value("${emailjs.template-id}")
+    private String TEMPLATE_ID;
+
+    @Value("${emailjs.public-key}")
+    private String PUBLIC_KEY;
+
+    @Value("${emailjs.private-key}")
+    private String PRIVATE_KEY;
 
     public void enviarCorreoAPI(String emailDestino, String nombreUsuario, String pin) {
         RestTemplate restTemplate = new RestTemplate();
@@ -41,13 +49,13 @@ public class EmailService {
 
         try {
             restTemplate.postForEntity(url, entity, String.class);
-            System.out.println("✅ PIN enviado con éxito a: " + emailDestino);
+            System.out.println("PIN enviado con éxito a: " + emailDestino);
         } catch (HttpClientErrorException e) {
-            System.err.println("❌ Error EmailJS - Código: " + e.getStatusCode());
-            System.err.println("❌ Respuesta EmailJS: " + e.getResponseBodyAsString());
+            System.err.println("Error EmailJS - Código: " + e.getStatusCode());
+            System.err.println("Respuesta EmailJS: " + e.getResponseBodyAsString());
             throw e;
         } catch (Exception e) {
-            System.err.println("❌ Error inesperado: " + e.getMessage());
+            System.err.println("Error inesperado: " + e.getMessage());
             throw e;
         }
     }
