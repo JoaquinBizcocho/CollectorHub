@@ -383,6 +383,22 @@ textarea.input-base {
   color: #66bb6a;
 }
 
+.btn-eliminar-cuenta {
+  background-color: transparent;
+  color: #ff5252;
+  border: 2px solid #ff5252;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-eliminar-cuenta:hover {
+  background-color: #ff5252;
+  color: white;
+}
+
 /* ===== ANIMACIONES COMPARTIDAS ===== */
 
 .animacion-fade {

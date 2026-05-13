@@ -92,3 +92,11 @@ export const adminApi = {
   getEstadisticas: () =>
     fetchConAuth(`${API_BASE}/api/admin/estadisticas`, { headers: headers() })
 };
+
+export const usuarioApi = {
+  eliminarCuenta: () =>
+    fetchConAuth(`${API_BASE}/api/usuario/cuenta`, {
+      method: 'DELETE',
+      headers: headers()
+    })
+};

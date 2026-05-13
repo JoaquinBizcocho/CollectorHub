@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './Categorias.css';
 import '../responsive/Responsive.css';
-import { categoriasApi } from '../../services/api';
+import { categoriasApi, usuarioApi } from '../../services/api';
 
 const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) => {
   const [categorias, setCategorias] = useState([]);
@@ -73,6 +73,34 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
     }
   };
 
+  const eliminarCuenta = async () => {
+    const primerConfirm = window.confirm(
+      "⚠️ ¿Estás seguro de que quieres eliminar tu cuenta?\n\nSe borrarán TODOS tus datos: categorías, artículos e imágenes. Esta acción es irreversible."
+    );
+    if (!primerConfirm) return;
+
+    const segundoConfirm = window.confirm(
+      "Esta es tu última oportunidad. ¿Confirmas que quieres borrar tu cuenta y todos tus datos permanentemente?"
+    );
+    if (!segundoConfirm) return;
+
+    try {
+      const response = await usuarioApi.eliminarCuenta();
+      if (response.ok) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuarioId');
+        localStorage.removeItem('alias');
+        localStorage.removeItem('rol');
+        window.location.reload();
+      } else {
+        alert("Error al eliminar la cuenta. Inténtalo de nuevo.");
+      }
+    } catch (error) {
+      console.error("Error al eliminar cuenta", error);
+      alert("Error de conexión al intentar eliminar la cuenta.");
+    }
+  };
+
   const crearDesdePlantilla = async (plantilla) => {
     const nuevaCategoria = {
       nombre: plantilla.nombre,
@@ -127,9 +155,14 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
     <div className="dashboard-wrapper">
       <header className="dashboard-topbar">
         <h1 className="logo-text">COLLECTOR HUB</h1>
-        <button className="btn-cerrar-sesion" onClick={alCerrarSesion}>
-          Cerrar Sesion
-        </button>
+        <div className="topbar-actions">
+          <button className="btn-eliminar-cuenta" onClick={eliminarCuenta}>
+            Eliminar cuenta
+          </button>
+          <button className="btn-cerrar-sesion" onClick={alCerrarSesion}>
+            Cerrar Sesion
+          </button>
+        </div>
       </header>
 
       <div className="dashboard-container">
