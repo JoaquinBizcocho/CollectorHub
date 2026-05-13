@@ -31,6 +31,32 @@ const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
   );
 };
 
+const formatearValor = (campo, valor) => {
+  if (campo.tipo === 'boolean') return valor ? 'Si' : 'No';
+  if (campo.tipo === 'date') return new Date(valor + 'T00:00:00').toLocaleDateString('es-ES');
+  return valor;
+};
+
+// Convierte los datos guardados (por nombre) a un formulario indexado por posición
+const datosAFormulario = (esquema, datos) => {
+  const formulario = {};
+  esquema.forEach((campo, index) => {
+    const clave = `campo_${index}`;
+    formulario[clave] = datos?.[campo.nombre] ?? '';
+  });
+  return formulario;
+};
+
+// Convierte el formulario indexado de vuelta a datos por nombre para guardar
+const formularioADatos = (esquema, formulario) => {
+  const datos = {};
+  esquema.forEach((campo, index) => {
+    const clave = `campo_${index}`;
+    datos[campo.nombre] = formulario[clave] ?? '';
+  });
+  return datos;
+};
+
 const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
   const [articulos, setArticulos] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -82,8 +108,8 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     }));
   };
 
-  const manejarCambioInput = (nombreCampo, valor) => {
-    setDatosFormulario({ ...datosFormulario, [nombreCampo]: valor });
+  const manejarCambioInput = (clave, valor) => {
+    setDatosFormulario(prev => ({ ...prev, [clave]: valor }));
   };
 
   const procesarArchivos = (archivos) => {
@@ -130,14 +156,14 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
 
   const abrirNuevoArticulo = () => {
     setIdEditando(null);
-    setDatosFormulario({});
+    setDatosFormulario(datosAFormulario(categoria.esquema || [], {}));
     setImagenes([]);
     setMostrarModal(true);
   };
 
   const abrirEdicion = (art) => {
     setIdEditando(art.id);
-    setDatosFormulario(art.datos || {});
+    setDatosFormulario(datosAFormulario(categoria.esquema || [], art.datos || {}));
     const imgs = [];
     if (art.imagen1) imgs.push(art.imagen1);
     if (art.imagen2) imgs.push(art.imagen2);
@@ -167,8 +193,9 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
 
     const camposFaltantes = [];
     if (categoria.esquema) {
-      categoria.esquema.forEach((campo) => {
-        const valor = datosFormulario[campo.nombre];
+      categoria.esquema.forEach((campo, index) => {
+        const clave = `campo_${index}`;
+        const valor = datosFormulario[clave];
         if (valor === undefined || valor === null || String(valor).trim() === "") {
           camposFaltantes.push(campo.nombre);
         }
@@ -182,7 +209,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
 
     const articuloGuardar = {
       categoriaId: categoria.id,
-      datos: datosFormulario,
+      datos: formularioADatos(categoria.esquema || [], datosFormulario),
       imagen1: imagenes[0] || null,
       imagen2: imagenes[1] || null
     };
@@ -249,7 +276,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                         <span className="dato-etiqueta">{campo.nombre}: </span>
                         <span className="dato-valor">
                           {art.datos && art.datos[campo.nombre] !== undefined && art.datos[campo.nombre] !== null && art.datos[campo.nombre] !== ''
-                            ? (campo.tipo === 'boolean' ? (art.datos[campo.nombre] ? 'Si' : 'No') : art.datos[campo.nombre])
+                            ? formatearValor(campo, art.datos[campo.nombre])
                             : '-'}
                         </span>
                       </div>
@@ -272,31 +299,34 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
               <h3>{idEditando ? 'Editar Articulo' : 'Añadir Articulo'}</h3>
               <form onSubmit={guardarArticulo}>
                 <div className="campos-dinamicos-grid">
-                  {categoria.esquema && categoria.esquema.map((campo, index) => (
-                    <div key={index} className="campo-dinamico">
-                      <label>{campo.nombre}</label>
-                      {campo.tipo === 'boolean' ? (
-                        <select
-                          className="input-base"
-                          value={datosFormulario[campo.nombre] !== undefined ? datosFormulario[campo.nombre] : ''}
-                          onChange={(e) => manejarCambioInput(campo.nombre, e.target.value === 'true' ? true : e.target.value === 'false' ? false : '')}
-                        >
-                          <option value="">Selecciona...</option>
-                          <option value="true">Si</option>
-                          <option value="false">No</option>
-                        </select>
-                      ) : (
-                        <input
-                          type={campo.tipo === 'number' ? 'number' : campo.tipo === 'date' ? 'date' : 'text'}
-                          className="input-base"
-                          placeholder={`Introduce ${campo.nombre}`}
-                          value={datosFormulario[campo.nombre] || ''}
-                          onChange={(e) => manejarCambioInput(campo.nombre, e.target.value)}
-                          maxLength={campo.tipo === 'text' ? 50 : undefined}
-                        />
-                      )}
-                    </div>
-                  ))}
+                  {categoria.esquema && categoria.esquema.map((campo, index) => {
+                    const clave = `campo_${index}`;
+                    return (
+                      <div key={index} className="campo-dinamico">
+                        <label>{campo.nombre}</label>
+                        {campo.tipo === 'boolean' ? (
+                          <select
+                            className="input-base"
+                            value={datosFormulario[clave] !== undefined ? datosFormulario[clave] : ''}
+                            onChange={(e) => manejarCambioInput(clave, e.target.value === 'true' ? true : e.target.value === 'false' ? false : '')}
+                          >
+                            <option value="">Selecciona...</option>
+                            <option value="true">Si</option>
+                            <option value="false">No</option>
+                          </select>
+                        ) : (
+                          <input
+                            type={campo.tipo === 'number' ? 'number' : campo.tipo === 'date' ? 'date' : 'text'}
+                            className="input-base"
+                            placeholder={`Introduce ${campo.nombre}`}
+                            value={datosFormulario[clave] || ''}
+                            onChange={(e) => manejarCambioInput(clave, e.target.value)}
+                            maxLength={campo.tipo === 'text' ? 50 : undefined}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 <div
@@ -308,8 +338,11 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                   tabIndex={0}
                 >
                   <h4>Imágenes (Max. 2)</h4>
+                  <p className="zona-imagenes-hint">
+                    📋 Pega con <kbd>Ctrl+V</kbd> · 🖱️ Arrastra aquí · o
+                  </p>
                   <label className={`btn-subir-imagen ${imagenes.length >= 2 ? 'disabled' : ''}`}>
-                    Seleccionar archivo
+                    📷 Seleccionar archivo
                     <input type="file" accept="image/*" multiple onChange={manejarSubidaImagen} disabled={imagenes.length >= 2} style={{ display: 'none' }} />
                   </label>
                   <div className="imagenes-preview-container">

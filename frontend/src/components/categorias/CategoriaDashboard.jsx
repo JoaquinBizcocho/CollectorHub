@@ -204,11 +204,11 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
                   <textarea placeholder="Descripcion breve..." value={descripcion} onChange={(e) => setDescripcion(e.target.value)} className="input-base" />
 
                   <div className="esquema-builder">
-                    <h4>Campos Personalizados (Opcional)</h4>
+                    <h4>Campos Personalizados</h4>
                     <p className="hint">Define que datos quieres guardar para estos objetos.</p>
                     {esquema.map((campo, index) => (
                       <div key={index} className="esquema-row">
-                        <input type="text" placeholder="Ej: Valoracion PSA" value={campo.nombre} onChange={(e) => actualizarCampoEsquema(index, 'nombre', e.target.value)} />
+                        <input type="text" placeholder="Ej: Valoracion" value={campo.nombre} onChange={(e) => actualizarCampoEsquema(index, 'nombre', e.target.value)} />
                         <select value={campo.tipo} onChange={(e) => actualizarCampoEsquema(index, 'tipo', e.target.value)}>
                           <option value="text">Texto Corto</option>
                           <option value="number">Numero</option>
@@ -222,7 +222,9 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
                   </div>
 
                   <div className="modal-actions">
-                    <button type="button" className="btn-cancelar" onClick={() => setPasoModal(1)}>Volver atras</button>
+                    <button onClick={idEditando ? cerrarModal : () => setPasoModal(1)}>
+                      {idEditando ? 'Cancelar' : 'Volver atras'}
+                    </button>
                     <button type="submit" className="btn-guardar">{idEditando ? 'Actualizar' : 'Guardar'}</button>
                   </div>
                 </form>
