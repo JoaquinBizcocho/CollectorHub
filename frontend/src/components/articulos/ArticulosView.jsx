@@ -2,9 +2,6 @@ import { useState, useEffect } from 'react';
 import '../categorias/Categorias.css';
 import { articulosApi } from '../../services/api';
 
-const [pestanaActiva, setPestanaActiva] = useState('COLECCION');
-
-
 const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
   const [indice, setIndice] = useState(0);
   
@@ -106,6 +103,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
   const [datosFormulario, setDatosFormulario] = useState({});
   const [imagenes, setImagenes] = useState([]);
   const [arrastrando, setArrastrando] = useState(false);
+  const [pestanaActiva, setPestanaActiva] = useState('COLECCION');
 
   const [ordenCampoIndex, setOrdenCampoIndex] = useState(null);
   const [ordenDireccion, setOrdenDireccion] = useState('asc');
@@ -282,23 +280,23 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     }
   };
 
+  const descargarArchivo = async (tipo) => {
+    const response = tipo === 'csv'
+      ? await articulosApi.exportarCsv(categoria.id)
+      : await articulosApi.exportarJson(categoria.id);
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${categoria.nombre}_coleccion.${tipo}`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const articulosOrdenados = ordenarArticulos(articulos, categoria.esquema, ordenCampoIndex, ordenDireccion);
   const articulosFiltrados = articulosOrdenados.filter(a => a.estado === pestanaActiva);
   const campoOrdenActual = ordenCampoIndex !== null ? categoria.esquema?.[ordenCampoIndex] : null;
-
-
-  const descargarArchivo = async (tipo) => {
-  const response = tipo === 'csv'
-    ? await articulosApi.exportarCsv(categoria.id)
-    : await articulosApi.exportarJson(categoria.id);
-
-  const blob = await response.blob();
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${categoria.nombre}_coleccion.${tipo}`;
-  a.click();
-  URL.revokeObjectURL(url);
-};
 
   return (
     <div className="dashboard-wrapper">
@@ -319,13 +317,13 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                 className={`btn-pestana ${pestanaActiva === 'COLECCION' ? 'activa' : ''}`}
                 onClick={() => setPestanaActiva('COLECCION')}
               >
-                Mi Colección
+                🗂️ Mi Colección
               </button>
               <button
                 className={`btn-pestana wishlist ${pestanaActiva === 'WISHLIST' ? 'activa wishlist-activa' : ''}`}
                 onClick={() => setPestanaActiva('WISHLIST')}
               >
-                Wishlist
+                ⭐ Wishlist
               </button>
             </div>
           </div>
@@ -337,7 +335,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
         </div>
 
         {/* Barra de ordenación compacta */}
-        {articulos.length > 0 && categoria.esquema?.length > 0 && (
+        {articulosFiltrados.length > 0 && categoria.esquema?.length > 0 && (
           <div className="orden-barra">
             <span className="orden-label">Ordenar por:</span>
             <div className="orden-control">
@@ -373,10 +371,14 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
         )}
 
         <div className="categorias-list">
-          {articulosOrdenados.length === 0 ? (
-            <p className="empty-state">No hay objetos en esta coleccion aun.</p>
+          {articulosFiltrados.length === 0 ? (
+            <p className="empty-state">
+              {pestanaActiva === 'WISHLIST'
+                ? 'No tienes artículos en tu Wishlist todavía.'
+                : 'No hay objetos en esta colección aún.'}
+            </p>
           ) : (
-            articulosOrdenados.map((art) => {
+            articulosFiltrados.map((art) => {
               const tieneImagenes = (art.imagen1 && art.imagen1 !== "") || (art.imagen2 && art.imagen2 !== "");
               return (
                 <div key={art.id} className="articulo-card">
