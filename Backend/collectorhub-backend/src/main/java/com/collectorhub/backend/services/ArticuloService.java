@@ -3,18 +3,23 @@ package com.collectorhub.backend.services;
 import com.collectorhub.backend.DTO.ArticuloDTO;
 import com.collectorhub.backend.Entidades.Articulo;
 import com.collectorhub.backend.Repository.ArticuloRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ArticuloService {
 
     @Autowired
     private ArticuloRepository articuloRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     public List<Articulo> obtenerPorCategoriaYUsuario(Integer categoriaId, Integer usuarioId) {
         return articuloRepository.findByCategoriaIdAndUsuarioId(categoriaId, usuarioId);
@@ -23,7 +28,7 @@ public class ArticuloService {
     public Articulo crearArticulo(ArticuloDTO dto, Integer usuarioId) {
         Articulo articulo = new Articulo();
         articulo.setCategoriaId(dto.getCategoriaId());
-        articulo.setUsuarioId(usuarioId); // Siempre del token, nunca del body
+        articulo.setUsuarioId(usuarioId);
         articulo.setDatos(dto.getDatos());
         articulo.setImagen1(dto.getImagen1());
         articulo.setImagen2(dto.getImagen2());
@@ -53,5 +58,45 @@ public class ArticuloService {
         }
 
         articuloRepository.deleteById(id);
+    }
+
+    public String exportarComoJson(Integer categoriaId, Integer usuarioId) {
+        List<Articulo> articulos = articuloRepository.findByCategoriaIdAndUsuarioId(categoriaId, usuarioId);
+        try {
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(articulos);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al generar JSON");
+        }
+    }
+
+    public String exportarComoCsv(Integer categoriaId, Integer usuarioId) {
+        List<Articulo> articulos = articuloRepository.findByCategoriaIdAndUsuarioId(categoriaId, usuarioId);
+        if (articulos.isEmpty()) return "id,datos\n";
+
+        StringBuilder sb = new StringBuilder();
+
+        // Cabecera: sacamos las claves del primer artículo
+        Map<String, Object> primerDato = articulos.get(0).getDatos();
+        sb.append("id");
+        if (primerDato != null) {
+            for (String clave : primerDato.keySet()) {
+                sb.append(",").append(clave);
+            }
+        }
+        sb.append("\n");
+
+        // Filas
+        for (Articulo art : articulos) {
+            sb.append(art.getId());
+            if (art.getDatos() != null) {
+                for (Object valor : art.getDatos().values()) {
+                    String v = valor == null ? "" : valor.toString().replace(",", ";");
+                    sb.append(",").append(v);
+                }
+            }
+            sb.append("\n");
+        }
+
+        return sb.toString();
     }
 }

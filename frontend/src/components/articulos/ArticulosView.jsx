@@ -281,6 +281,21 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
   const articulosOrdenados = ordenarArticulos(articulos, categoria.esquema, ordenCampoIndex, ordenDireccion);
   const campoOrdenActual = ordenCampoIndex !== null ? categoria.esquema?.[ordenCampoIndex] : null;
 
+
+  const descargarArchivo = async (tipo) => {
+  const response = tipo === 'csv'
+    ? await articulosApi.exportarCsv(categoria.id)
+    : await articulosApi.exportarJson(categoria.id);
+
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${categoria.nombre}_coleccion.${tipo}`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
   return (
     <div className="dashboard-wrapper">
       <header className="dashboard-topbar">
@@ -297,9 +312,17 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
             <h2 className="welcome-text">{categoria.nombre}</h2>
             <h3 className="section-title">Inventario</h3>
           </div>
-          <button className="btn-nueva-categoria" onClick={abrirNuevoArticulo}>
-            + Añadir Articulo
-          </button>
+          <div className="topbar-actions">
+            <button className="btn-volver" onClick={() => descargarArchivo('csv')}>
+              Exportar CSV
+            </button>
+            <button className="btn-volver" onClick={() => descargarArchivo('json')}>
+              Exportar JSON
+            </button>
+            <button className="btn-nueva-categoria" onClick={abrirNuevoArticulo}>
+              + Añadir Articulo
+            </button>
+          </div>
         </div>
 
         {/* Barra de ordenación compacta */}

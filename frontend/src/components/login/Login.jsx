@@ -29,6 +29,10 @@ const manejarLogin = async (e) => {
       const data = await respuesta.json();
 
      if (respuesta.ok) {
+    if (typeof data.token !== 'string' || !data.token) {
+        setMensaje("Error: respuesta del servidor inválida.");
+        return;
+    }
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuarioId', data.usuarioId);
         localStorage.setItem('alias', alias); 
@@ -49,13 +53,6 @@ const manejarLogin = async (e) => {
 
   return (
     <div className="login-card">
-      {/* <button 
-        className="login-theme-btn"
-        onClick={() => setIsDarkMode(!isDarkMode)}
-        title="Cambiar tema"
-      >
-        {isDarkMode ? '☀️' : '🌙'}
-      </button> */}
 
       <h1 className="login-title">CollectorHub</h1>
       

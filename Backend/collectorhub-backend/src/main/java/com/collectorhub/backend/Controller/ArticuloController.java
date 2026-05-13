@@ -6,6 +6,8 @@ import com.collectorhub.backend.security.AuthenticatedUser;
 import com.collectorhub.backend.services.ArticuloService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +28,30 @@ public class ArticuloController {
             Authentication authentication) {
         AuthenticatedUser usuario = (AuthenticatedUser) authentication.getPrincipal();
         return ResponseEntity.ok(articuloService.obtenerPorCategoriaYUsuario(categoriaId, usuario.getId()));
+    }
+
+    @GetMapping("/categoria/{categoriaId}/exportar/json")
+    public ResponseEntity<String> exportarJson(
+            @PathVariable Integer categoriaId,
+            Authentication authentication) {
+        AuthenticatedUser usuario = (AuthenticatedUser) authentication.getPrincipal();
+        String json = articuloService.exportarComoJson(categoriaId, usuario.getId());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"coleccion_" + categoriaId + ".json\"")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(json);
+    }
+
+    @GetMapping("/categoria/{categoriaId}/exportar/csv")
+    public ResponseEntity<String> exportarCsv(
+            @PathVariable Integer categoriaId,
+            Authentication authentication) {
+        AuthenticatedUser usuario = (AuthenticatedUser) authentication.getPrincipal();
+        String csv = articuloService.exportarComoCsv(categoriaId, usuario.getId());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"coleccion_" + categoriaId + ".csv\"")
+                .contentType(MediaType.parseMediaType("text/csv"))
+                .body(csv);
     }
 
     @PostMapping

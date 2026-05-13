@@ -61,6 +61,12 @@ export const articulosApi = {
   getByCategoria: (categoriaId) =>
     fetchConAuth(`${API_BASE}/api/articulos/categoria/${categoriaId}`, { headers: headers() }),
 
+  exportarJson: (categoriaId) =>
+    fetchConAuth(`${API_BASE}/api/articulos/categoria/${categoriaId}/exportar/json`, { headers: headers() }),
+
+  exportarCsv: (categoriaId) =>
+    fetchConAuth(`${API_BASE}/api/articulos/categoria/${categoriaId}/exportar/csv`, { headers: headers() }),
+
   crear: (data) =>
     fetchConAuth(`${API_BASE}/api/articulos`, {
       method: 'POST',
