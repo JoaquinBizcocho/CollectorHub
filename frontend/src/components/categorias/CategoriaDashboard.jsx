@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import './Categorias.css';
-import '../responsive/Responsive.css'
+import '../responsive/Responsive.css';
 import { categoriasApi } from '../../services/api';
 
 const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) => {

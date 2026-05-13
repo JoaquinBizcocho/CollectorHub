@@ -1,0 +1,132 @@
+/* src/Responsive.css */
+
+/* ===== MEDIA QUERIES ===== */
+
+@media (max-width: 768px) {
+  /* 1. Cabecera superior */
+  .dashboard-topbar {
+    padding: 15px 20px;
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  /* 2. Contenedor principal y cabecera de sección */
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .btn-nueva-categoria {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* 3. Tarjetas de categorías (Pasan de horizontal a vertical) */
+  .categoria-card-horizontal {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem;
+    gap: 15px;
+  }
+
+  .categoria-card-horizontal:hover,
+  .categoria-card-horizontal:active {
+    transform: none !important; 
+    box-shadow: 0 5px 15px var(--sombra) !important;
+    border-left: none !important;
+  }
+
+  .categoria-acciones {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  
+  .btn-entrar {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  /* 4. Tarjetas de Artículos */
+  .articulo-card {
+    flex-direction: column;
+    align-items: center;
+    padding: 1.2rem;
+    text-align: center;
+  }
+
+  .articulo-info {
+    grid-template-columns: 1fr;
+    width: 100%;
+    text-align: left;
+  }
+
+  .articulo-acciones-vertical {
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 15px;
+  }
+
+  .btn-icon-text {
+    flex: 1;
+    min-width: 100px;
+  }
+
+  /* 5. Modales y Formularios */
+  .modal-content {
+    padding: 1.5rem;
+    width: 95%;
+  }
+
+  .campos-dinamicos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .esquema-row {
+    flex-direction: column;
+  }
+  
+  .esquema-row button {
+    padding: 12px;
+    margin-top: 5px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .btn-guardar, .btn-cancelar {
+    width: 100%;
+  }
+
+  /* 6. Panel de Administración (Estadísticas) */
+  .estadisticas-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* 7. Lightbox flechas */
+  .btn-flecha-lightbox.izq { left: 10px; }
+  .btn-flecha-lightbox.der { right: 10px; }
+}
+
+/* Solo aplica el hover si el dispositivo tiene un cursor (ratón) */
+@media (hover: hover) {
+  .categoria-card-horizontal:hover {
+    transform: translateX(5px); 
+    box-shadow: 0 8px 25px var(--sombra);
+    border-left: 5px solid #66bb6a; 
+  }
+  
+  .btn-ruta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  }
+}
