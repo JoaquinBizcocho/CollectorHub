@@ -222,7 +222,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
                   </div>
 
                   <div className="modal-actions">
-                    <button onClick={idEditando ? cerrarModal : () => setPasoModal(1)}>
+                    <button type="button" className="btn-cancelar" onClick={idEditando ? cerrarModal : () => setPasoModal(1)}>
                       {idEditando ? 'Cancelar' : 'Volver atras'}
                     </button>
                     <button type="submit" className="btn-guardar">{idEditando ? 'Actualizar' : 'Guardar'}</button>

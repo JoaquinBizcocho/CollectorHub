@@ -32,27 +32,30 @@ const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
 };
 
 const formatearValor = (campo, valor) => {
-  if (campo.tipo === 'boolean') return valor ? 'Si' : 'No';
+  if (campo.tipo === 'boolean') return valor === true || valor === 'true' ? 'Si' : 'No';
   if (campo.tipo === 'date') return new Date(valor + 'T00:00:00').toLocaleDateString('es-ES');
   return valor;
 };
 
-// Convierte los datos guardados (por nombre) a un formulario indexado por posición
+// Clave única por posición, independiente del nombre
+const claveIndice = (index) => `campo_${index}`;
+
+// Al abrir el modal: convierte datos guardados (por índice) al estado del formulario
 const datosAFormulario = (esquema, datos) => {
   const formulario = {};
-  esquema.forEach((campo, index) => {
-    const clave = `campo_${index}`;
-    formulario[clave] = datos?.[campo.nombre] ?? '';
+  esquema.forEach((_, index) => {
+    const clave = claveIndice(index);
+    formulario[clave] = datos?.[clave] ?? '';
   });
   return formulario;
 };
 
-// Convierte el formulario indexado de vuelta a datos por nombre para guardar
+// Al guardar: convierte el estado del formulario al objeto que se envía al backend
 const formularioADatos = (esquema, formulario) => {
   const datos = {};
-  esquema.forEach((campo, index) => {
-    const clave = `campo_${index}`;
-    datos[campo.nombre] = formulario[clave] ?? '';
+  esquema.forEach((_, index) => {
+    const clave = claveIndice(index);
+    datos[clave] = formulario[clave] ?? '';
   });
   return datos;
 };
@@ -194,7 +197,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     const camposFaltantes = [];
     if (categoria.esquema) {
       categoria.esquema.forEach((campo, index) => {
-        const clave = `campo_${index}`;
+        const clave = claveIndice(index);
         const valor = datosFormulario[clave];
         if (valor === undefined || valor === null || String(valor).trim() === "") {
           camposFaltantes.push(campo.nombre);
@@ -271,16 +274,20 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                   )}
 
                   <div className="articulo-info">
-                    {categoria.esquema && categoria.esquema.map((campo, idx) => (
-                      <div key={idx} className="articulo-dato">
-                        <span className="dato-etiqueta">{campo.nombre}: </span>
-                        <span className="dato-valor">
-                          {art.datos && art.datos[campo.nombre] !== undefined && art.datos[campo.nombre] !== null && art.datos[campo.nombre] !== ''
-                            ? formatearValor(campo, art.datos[campo.nombre])
-                            : '-'}
-                        </span>
-                      </div>
-                    ))}
+                    {categoria.esquema && categoria.esquema.map((campo, idx) => {
+                      const clave = claveIndice(idx);
+                      const valor = art.datos?.[clave];
+                      return (
+                        <div key={idx} className="articulo-dato">
+                          <span className="dato-etiqueta">{campo.nombre}: </span>
+                          <span className="dato-valor">
+                            {valor !== undefined && valor !== null && valor !== ''
+                              ? formatearValor(campo, valor)
+                              : '-'}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
 
                   <div className="articulo-acciones-vertical">
@@ -300,7 +307,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
               <form onSubmit={guardarArticulo}>
                 <div className="campos-dinamicos-grid">
                   {categoria.esquema && categoria.esquema.map((campo, index) => {
-                    const clave = `campo_${index}`;
+                    const clave = claveIndice(index);
                     return (
                       <div key={index} className="campo-dinamico">
                         <label>{campo.nombre}</label>
@@ -338,11 +345,8 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                   tabIndex={0}
                 >
                   <h4>Imágenes (Max. 2)</h4>
-                  <p className="zona-imagenes-hint">
-                    📋 Pega con <kbd>Ctrl+V</kbd> · 🖱️ Arrastra aquí · o
-                  </p>
                   <label className={`btn-subir-imagen ${imagenes.length >= 2 ? 'disabled' : ''}`}>
-                    📷 Seleccionar archivo
+                    Seleccionar archivo
                     <input type="file" accept="image/*" multiple onChange={manejarSubidaImagen} disabled={imagenes.length >= 2} style={{ display: 'none' }} />
                   </label>
                   <div className="imagenes-preview-container">
