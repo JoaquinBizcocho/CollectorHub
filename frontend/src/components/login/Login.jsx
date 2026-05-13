@@ -16,7 +16,7 @@ const Login = ({ alIrARegistro, alEntrar }) => {
     localStorage.setItem('collectorhub-tema', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
-const manejarLogin = async (e) => {
+  const manejarLogin = async (e) => {
     e.preventDefault();
 
     try {
@@ -26,28 +26,35 @@ const manejarLogin = async (e) => {
         body: JSON.stringify({ alias: alias, password: password })
       });
 
-      const data = await respuesta.json();
+      if (respuesta.ok) {
+        const data = await respuesta.json();
 
-     if (respuesta.ok) {
-    if (typeof data.token !== 'string' || !data.token) {
-        setMensaje("Error: respuesta del servidor inválida.");
-        return;
-    }
+        if (typeof data.token !== 'string' || !data.token) {
+          setMensaje("Error: respuesta del servidor inválida.");
+          return;
+        }
+
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuarioId', data.usuarioId);
-        localStorage.setItem('alias', alias); 
+        localStorage.setItem('alias', alias);
         localStorage.setItem('rol', data.rol);
-        
+
         setMensaje("¡Acceso correcto! Entrando...");
-        
-        setTimeout(() => {
-          alEntrar(); 
-        }, 1000);
+        setTimeout(() => { alEntrar(); }, 1000);
+
       } else {
-        setMensaje("Error: " + data.mensaje);
+        const texto = await respuesta.text();
+        if (respuesta.status === 401) {
+          setMensaje("Alias o contraseña incorrectos.");
+        } else if (respuesta.status === 403) {
+          setMensaje("Cuenta no verificada. Revisa tu correo electrónico.");
+        } else {
+          setMensaje(texto || "Error al iniciar sesión. Inténtalo de nuevo.");
+        }
       }
+
     } catch (error) {
-      setMensaje("Error crítico de conexión con el servidor. Revisa que el backend esté encendido.");
+      setMensaje("No se puede conectar con el servidor. Espera unos segundos e inténtalo de nuevo.");
     }
   };
 

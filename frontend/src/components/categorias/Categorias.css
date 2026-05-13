@@ -385,18 +385,20 @@ textarea.input-base {
 
 .btn-eliminar-cuenta {
   background-color: transparent;
-  color: #ff5252;
-  border: 2px solid #ff5252;
-  padding: 8px 16px;
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 6px 12px;
   border-radius: 8px;
-  font-weight: bold;
+  font-weight: normal;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .btn-eliminar-cuenta:hover {
-  background-color: #ff5252;
-  color: white;
+  color: #ff5252;
+  border-color: #ff5252;
+  background-color: transparent;
 }
 
 /* ===== ANIMACIONES COMPARTIDAS ===== */
