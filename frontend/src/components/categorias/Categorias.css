@@ -628,6 +628,41 @@ textarea.input-base {
   right: -70px;
 }
 
+/* ===== ZONA IMÁGENES: drag & drop + pegar ===== */
+
+.zona-imagenes:focus {
+  outline: 2px solid #66bb6a;
+}
+
+.zona-imagenes.arrastrando {
+  background-color: rgba(102, 187, 106, 0.15);
+  border-color: #4caf50;
+  border-style: solid;
+}
+
+.zona-imagenes-hint {
+  font-size: 0.85rem;
+  color: #9e9e9e;
+  margin: 0 0 10px 0;
+}
+
+.zona-imagenes-hint kbd {
+  background: var(--bg-input);
+  border: 1px solid var(--borde-input);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.8rem;
+  font-family: inherit;
+}
+
+.btn-subir-imagen.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+
+
 @media (max-width: 768px) {
   .btn-flecha-lightbox.izq { left: 10px; }
   .btn-flecha-lightbox.der { right: 10px; }

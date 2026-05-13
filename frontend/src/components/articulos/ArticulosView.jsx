@@ -37,6 +37,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
   const [idEditando, setIdEditando] = useState(null);
   const [datosFormulario, setDatosFormulario] = useState({});
   const [imagenes, setImagenes] = useState([]);
+  const [arrastrando, setArrastrando] = useState(false);
 
   const [lightbox, setLightbox] = useState({ 
     activo: false, 
@@ -85,8 +86,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     setDatosFormulario({ ...datosFormulario, [nombreCampo]: valor });
   };
 
-  const manejarSubidaImagen = (e) => {
-    const archivos = Array.from(e.target.files);
+  const procesarArchivos = (archivos) => {
     if (imagenes.length + archivos.length > 2) {
       alert("Solo puedes subir un maximo de 2 imagenes por articulo.");
       return;
@@ -98,6 +98,30 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
       };
       reader.readAsDataURL(archivo);
     });
+  };
+
+  const manejarSubidaImagen = (e) => {
+    procesarArchivos(Array.from(e.target.files));
+  };
+
+  const manejarDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setArrastrando(false);
+    const archivos = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    procesarArchivos(archivos);
+  };
+
+  const manejarPegado = (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    const archivos = [];
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        archivos.push(item.getAsFile());
+      }
+    }
+    procesarArchivos(archivos);
   };
 
   const quitarImagen = (index) => {
@@ -270,10 +294,20 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                   ))}
                 </div>
 
-                <div className="zona-imagenes">
-                  <h4>Imagenes (Max. 2)</h4>
-                  <label className="btn-subir-imagen">
-                    📷 Añadir imagen
+                <div
+                  className={`zona-imagenes ${arrastrando ? 'arrastrando' : ''}`}
+                  onDrop={manejarDrop}
+                  onDragOver={(e) => { e.preventDefault(); setArrastrando(true); }}
+                  onDragLeave={() => setArrastrando(false)}
+                  onPaste={manejarPegado}
+                  tabIndex={0}
+                >
+                  <h4>Imágenes (Max. 2)</h4>
+                  <p className="zona-imagenes-hint">
+                    📋 Pega con <kbd>Ctrl+V</kbd> · 🖱️ Arrastra aquí · o
+                  </p>
+                  <label className={`btn-subir-imagen ${imagenes.length >= 2 ? 'disabled' : ''}`}>
+                    📷 Seleccionar archivo
                     <input type="file" accept="image/*" multiple onChange={manejarSubidaImagen} disabled={imagenes.length >= 2} style={{ display: 'none' }} />
                   </label>
                   <div className="imagenes-preview-container">
