@@ -810,6 +810,47 @@ textarea.input-base {
   color: #ffb300 !important;
 }
 
+.pestanas-wrapper {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.btn-pestana {
+  background: transparent;
+  border: 2px solid var(--borde-input);
+  color: var(--texto-input);
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.btn-pestana:hover {
+  border-color: #66bb6a;
+  color: #66bb6a;
+}
+
+.btn-pestana.activa {
+  background-color: #66bb6a;
+  border-color: #66bb6a;
+  color: white;
+}
+
+.btn-pestana.wishlist:hover {
+  border-color: #ffb300;
+  color: #ffb300;
+}
+
+.btn-pestana.wishlist-activa {
+  background-color: #ffb300 !important;
+  border-color: #ffb300 !important;
+  color: #000 !important;
+}
+
+
 @keyframes parpadeo {
   0% { opacity: 0.3; }
   50% { opacity: 1; }

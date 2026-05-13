@@ -21,12 +21,13 @@ public class Articulo {
     @Column(name = "usuario_id", nullable = false)
     private Integer usuarioId;
 
-    // Aqui guardaremos las respuestas dinamicas  {"PSA": "10", "Año": 2019}
+    @Column(name = "estado", nullable = false)
+    private String estado = "COLECCION";
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
     private Map<String, Object> datos;
 
-    // LONGTEXT es necesario porque las imagenes en Base64 ocupan muchos caracteres
     @Column(columnDefinition = "LONGTEXT")
     private String imagen1;
 

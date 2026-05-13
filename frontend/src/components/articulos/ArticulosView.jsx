@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import '../categorias/Categorias.css';
 import { articulosApi } from '../../services/api';
 
+const [pestanaActiva, setPestanaActiva] = useState('COLECCION');
+
+
 const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
   const [indice, setIndice] = useState(0);
   
@@ -256,6 +259,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
 
     const articuloGuardar = {
       categoriaId: categoria.id,
+      estado: idEditando ? (articulos.find(a => a.id === idEditando)?.estado || pestanaActiva) : pestanaActiva,
       datos: formularioADatos(categoria.esquema || [], datosFormulario),
       imagen1: imagenes[0] || null,
       imagen2: imagenes[1] || null
@@ -278,7 +282,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     }
   };
 
-  const articulosOrdenados = ordenarArticulos(articulos, categoria.esquema, ordenCampoIndex, ordenDireccion);
+  const articulosFiltrados = articulosOrdenados.filter(a => a.estado === pestanaActiva);
   const campoOrdenActual = ordenCampoIndex !== null ? categoria.esquema?.[ordenCampoIndex] : null;
 
 
@@ -310,18 +314,25 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
         <div className="dashboard-header">
           <div className="header-titles">
             <h2 className="welcome-text">{categoria.nombre}</h2>
-            <h3 className="section-title">Inventario</h3>
+            <div className="pestanas-wrapper">
+              <button
+                className={`btn-pestana ${pestanaActiva === 'COLECCION' ? 'activa' : ''}`}
+                onClick={() => setPestanaActiva('COLECCION')}
+              >
+                Mi Colección
+              </button>
+              <button
+                className={`btn-pestana wishlist ${pestanaActiva === 'WISHLIST' ? 'activa wishlist-activa' : ''}`}
+                onClick={() => setPestanaActiva('WISHLIST')}
+              >
+                Wishlist
+              </button>
+            </div>
           </div>
           <div className="topbar-actions">
-            <button className="btn-nueva-categoria" onClick={() => descargarArchivo('csv')}>
-              Exportar CSV
-            </button>
-            <button className="btn-nueva-categoria" onClick={() => descargarArchivo('json')}>
-              Exportar JSON
-            </button>
-            <button className="btn-nueva-categoria" onClick={abrirNuevoArticulo}>
-              + Añadir Articulo
-            </button>
+            <button className="btn-nueva-categoria" onClick={() => descargarArchivo('csv')}>Exportar CSV</button>
+            <button className="btn-nueva-categoria" onClick={() => descargarArchivo('json')}>Exportar JSON</button>
+            <button className="btn-nueva-categoria" onClick={abrirNuevoArticulo}>+ Añadir Articulo</button>
           </div>
         </div>
 

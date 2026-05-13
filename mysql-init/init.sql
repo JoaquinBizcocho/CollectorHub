@@ -26,6 +26,7 @@ CREATE TABLE articulos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     categoria_id INT NOT NULL,
     usuario_id BIGINT NOT NULL,
+    estado VARCHAR(20) NOT NULL DEFAULT 'COLECCION',
     datos JSON,
     imagen1 LONGTEXT,
     imagen2 LONGTEXT,

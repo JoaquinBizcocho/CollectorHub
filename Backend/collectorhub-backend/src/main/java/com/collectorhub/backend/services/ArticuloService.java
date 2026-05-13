@@ -29,6 +29,7 @@ public class ArticuloService {
         Articulo articulo = new Articulo();
         articulo.setCategoriaId(dto.getCategoriaId());
         articulo.setUsuarioId(usuarioId);
+        articulo.setEstado(dto.getEstado() != null ? dto.getEstado() : "COLECCION");
         articulo.setDatos(dto.getDatos());
         articulo.setImagen1(dto.getImagen1());
         articulo.setImagen2(dto.getImagen2());
@@ -43,6 +44,7 @@ public class ArticuloService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para editar este articulo");
         }
 
+        articulo.setEstado(dto.getEstado() != null ? dto.getEstado() : articulo.getEstado());
         articulo.setDatos(dto.getDatos());
         articulo.setImagen1(dto.getImagen1());
         articulo.setImagen2(dto.getImagen2());
@@ -66,6 +68,7 @@ public class ArticuloService {
             List<Map<String, Object>> exportar = articulos.stream().map(art -> {
                 Map<String, Object> item = new java.util.LinkedHashMap<>();
                 item.put("id", art.getId());
+                item.put("estado", art.getEstado());
                 item.put("datos", art.getDatos());
                 return item;
             }).toList();
@@ -77,13 +80,11 @@ public class ArticuloService {
 
     public String exportarComoCsv(Integer categoriaId, Integer usuarioId) {
         List<Articulo> articulos = articuloRepository.findByCategoriaIdAndUsuarioId(categoriaId, usuarioId);
-        if (articulos.isEmpty()) return "id,datos\n";
+        if (articulos.isEmpty()) return "id,estado,datos\n";
 
         StringBuilder sb = new StringBuilder();
-
-        // Cabecera: sacamos las claves del primer artículo
         Map<String, Object> primerDato = articulos.get(0).getDatos();
-        sb.append("id");
+        sb.append("id,estado");
         if (primerDato != null) {
             for (String clave : primerDato.keySet()) {
                 sb.append(",").append(clave);
@@ -91,9 +92,8 @@ public class ArticuloService {
         }
         sb.append("\n");
 
-        // Filas
         for (Articulo art : articulos) {
-            sb.append(art.getId());
+            sb.append(art.getId()).append(",").append(art.getEstado());
             if (art.getDatos() != null) {
                 for (Object valor : art.getDatos().values()) {
                     String v = valor == null ? "" : valor.toString().replace(",", ";");
