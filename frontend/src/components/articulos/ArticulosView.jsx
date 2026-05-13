@@ -67,7 +67,6 @@ const ordenarArticulos = (articulos, esquema, campoIndex, direccion) => {
     const valA = a.datos?.[clave] ?? '';
     const valB = b.datos?.[clave] ?? '';
 
-    // Vacíos siempre al final
     if (valA === '' && valB !== '') return 1;
     if (valB === '' && valA !== '') return -1;
     if (valA === '' && valB === '') return 0;
@@ -79,7 +78,7 @@ const ordenarArticulos = (articulos, esquema, campoIndex, direccion) => {
     } else if (campo.tipo === 'boolean') {
       const numA = (valA === true || valA === 'true') ? 1 : 0;
       const numB = (valB === true || valB === 'true') ? 1 : 0;
-      resultado = numB - numA; // Si primero por defecto
+      resultado = numB - numA;
     } else if (campo.tipo === 'date') {
       resultado = new Date(valA) - new Date(valB);
     } else {
@@ -91,10 +90,10 @@ const ordenarArticulos = (articulos, esquema, campoIndex, direccion) => {
 };
 
 const etiquetaDireccion = (tipo, direccion) => {
-  if (tipo === 'number') return direccion === 'asc' ? '↑ Menor a Mayor' : '↓ Mayor a Menor';
-  if (tipo === 'boolean') return direccion === 'asc' ? '↑ Sí primero' : '↓ No primero';
-  if (tipo === 'date') return direccion === 'asc' ? '↑ Más antiguo' : '↓ Más reciente';
-  return direccion === 'asc' ? '↑ A → Z' : '↓ Z → A';
+  if (tipo === 'number') return direccion === 'asc' ? '↑ Menor' : '↓ Mayor';
+  if (tipo === 'boolean') return direccion === 'asc' ? '↑ Sí' : '↓ No';
+  if (tipo === 'date') return direccion === 'asc' ? '↑ Antiguo' : '↓ Reciente';
+  return direccion === 'asc' ? '↑ A→Z' : '↓ Z→A';
 };
 
 const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
@@ -118,7 +117,6 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     cargarArticulos();
   }, [categoria]);
 
-  // Resetear orden al cambiar de categoría
   useEffect(() => {
     setOrdenCampoIndex(null);
     setOrdenDireccion('asc');
@@ -304,33 +302,39 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
           </button>
         </div>
 
-        {/* Barra de ordenación — solo visible si hay artículos y campos */}
+        {/* Barra de ordenación compacta */}
         {articulos.length > 0 && categoria.esquema?.length > 0 && (
           <div className="orden-barra">
             <span className="orden-label">Ordenar por:</span>
-            <select
-              className="orden-select"
-              value={ordenCampoIndex ?? ''}
-              onChange={(e) => {
-                const val = e.target.value;
-                setOrdenCampoIndex(val === '' ? null : parseInt(val));
-                setOrdenDireccion('asc');
-              }}
-            >
-              <option value="">— Sin ordenar —</option>
-              {categoria.esquema.map((campo, idx) => (
-                <option key={idx} value={idx}>{campo.nombre}</option>
-              ))}
-            </select>
-
-            {ordenCampoIndex !== null && (
-              <button
-                className="btn-orden-direccion"
-                onClick={() => setOrdenDireccion(prev => prev === 'asc' ? 'desc' : 'asc')}
+            <div className="orden-control">
+              <select
+                className="orden-select"
+                value={ordenCampoIndex ?? ''}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setOrdenCampoIndex(val === '' ? null : parseInt(val));
+                  setOrdenDireccion('asc');
+                }}
               >
-                {etiquetaDireccion(campoOrdenActual?.tipo, ordenDireccion)}
-              </button>
-            )}
+                <option value="">— Sin ordenar —</option>
+                {categoria.esquema.map((campo, idx) => (
+                  <option key={idx} value={idx}>{campo.nombre}</option>
+                ))}
+              </select>
+
+              {ordenCampoIndex !== null && (
+                <>
+                  <div className="orden-divisor" />
+                  <button
+                    type="button"
+                    className="btn-orden-direccion"
+                    onClick={() => setOrdenDireccion(prev => prev === 'asc' ? 'desc' : 'asc')}
+                  >
+                    {etiquetaDireccion(campoOrdenActual?.tipo, ordenDireccion)}
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         )}
 
