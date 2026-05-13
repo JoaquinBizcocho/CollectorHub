@@ -17,7 +17,7 @@ const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
   }, [imagenesValidas.length]);
 
   if (imagenesValidas.length === 0) {
-    return <div className="articulo-sin-imagen">Sin imagen</div>;
+    return null;
   }
 
   return (
@@ -229,35 +229,40 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
           {articulos.length === 0 ? (
             <p className="empty-state">No hay objetos en esta coleccion aun.</p>
           ) : (
-            articulos.map((art) => (
-              <div key={art.id} className="articulo-card">
-                <div className="articulo-imagen-container">
-                  <CarruselMiniatura 
-                    imagen1={art.imagen1} 
-                    imagen2={art.imagen2} 
-                    alHacerClic={abrirLightbox} 
-                  />
-                </div>
-
-                <div className="articulo-info">
-                  {categoria.esquema && categoria.esquema.map((campo, idx) => (
-                    <div key={idx} className="articulo-dato">
-                      <span className="dato-etiqueta">{campo.nombre}: </span>
-                      <span className="dato-valor">
-                        {art.datos && art.datos[campo.nombre] !== undefined && art.datos[campo.nombre] !== null && art.datos[campo.nombre] !== ''
-                          ? (campo.tipo === 'boolean' ? (art.datos[campo.nombre] ? 'Si' : 'No') : art.datos[campo.nombre])
-                          : '-'}
-                      </span>
+            articulos.map((art) => {
+              const tieneImagenes = (art.imagen1 && art.imagen1 !== "") || (art.imagen2 && art.imagen2 !== "");
+              return (
+                <div key={art.id} className="articulo-card">
+                  {tieneImagenes && (
+                    <div className="articulo-imagen-container">
+                      <CarruselMiniatura 
+                        imagen1={art.imagen1} 
+                        imagen2={art.imagen2} 
+                        alHacerClic={abrirLightbox} 
+                      />
                     </div>
-                  ))}
-                </div>
+                  )}
 
-                <div className="articulo-acciones-vertical">
-                  <button className="btn-icon-text" onClick={() => abrirEdicion(art)}>Editar</button>
-                  <button className="btn-icon-text peligro" onClick={() => borrarArticulo(art.id)}>Eliminar</button>
+                  <div className="articulo-info">
+                    {categoria.esquema && categoria.esquema.map((campo, idx) => (
+                      <div key={idx} className="articulo-dato">
+                        <span className="dato-etiqueta">{campo.nombre}: </span>
+                        <span className="dato-valor">
+                          {art.datos && art.datos[campo.nombre] !== undefined && art.datos[campo.nombre] !== null && art.datos[campo.nombre] !== ''
+                            ? (campo.tipo === 'boolean' ? (art.datos[campo.nombre] ? 'Si' : 'No') : art.datos[campo.nombre])
+                            : '-'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="articulo-acciones-vertical">
+                    <button className="btn-icon-text" onClick={() => abrirEdicion(art)}>Editar</button>
+                    <button className="btn-icon-text peligro" onClick={() => borrarArticulo(art.id)}>Eliminar</button>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 
@@ -303,11 +308,8 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                   tabIndex={0}
                 >
                   <h4>Imágenes (Max. 2)</h4>
-                  <p className="zona-imagenes-hint">
-                    📋 Pega con <kbd>Ctrl+V</kbd> · 🖱️ Arrastra aquí · o
-                  </p>
                   <label className={`btn-subir-imagen ${imagenes.length >= 2 ? 'disabled' : ''}`}>
-                    📷 Seleccionar archivo
+                    Seleccionar archivo
                     <input type="file" accept="image/*" multiple onChange={manejarSubidaImagen} disabled={imagenes.length >= 2} style={{ display: 'none' }} />
                   </label>
                   <div className="imagenes-preview-container">
