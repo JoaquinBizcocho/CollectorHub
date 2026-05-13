@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import '../categorias/Categorias.css';
+import './Admin.css';
+import '../responsive/Responsive.css'
 import { categoriasApi, adminApi } from '../../services/api';
 
 const AdminDashboard = ({ alVolver, alCerrarSesion }) => {

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import '../categorias/Categorias.css';
+import './Articulos.css';
+import '../responsive/Responsive.css'
 import { articulosApi } from '../../services/api';
 
 const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
@@ -334,7 +336,6 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
           </div>
         </div>
 
-        {/* Barra de ordenación compacta */}
         {articulosFiltrados.length > 0 && categoria.esquema?.length > 0 && (
           <div className="orden-barra">
             <span className="orden-label">Ordenar por:</span>

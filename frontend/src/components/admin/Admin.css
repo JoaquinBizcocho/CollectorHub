@@ -1,0 +1,32 @@
+/* src/components/admin/Admin.css */
+
+/* ===== PANEL DE ADMINISTRACIÓN ===== */
+
+.estadisticas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.estadistica-card {
+  background: var(--bg-tarjeta);
+  padding: 2rem;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 5px 15px var(--sombra);
+  border-top: 5px solid #ffb300; 
+}
+
+.estadistica-card h3 {
+  margin: 0;
+  color: var(--texto-input);
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+.estadistica-numero {
+  margin: 15px 0 0 0;
+  font-size: 3rem;
+  font-weight: 900;
+  color: #ffb300;
+}
