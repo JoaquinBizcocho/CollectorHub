@@ -37,10 +37,8 @@ const formatearValor = (campo, valor) => {
   return valor;
 };
 
-// Clave única por posición, independiente del nombre
 const claveIndice = (index) => `campo_${index}`;
 
-// Al abrir el modal: convierte datos guardados (por índice) al estado del formulario
 const datosAFormulario = (esquema, datos) => {
   const formulario = {};
   esquema.forEach((_, index) => {
@@ -50,7 +48,6 @@ const datosAFormulario = (esquema, datos) => {
   return formulario;
 };
 
-// Al guardar: convierte el estado del formulario al objeto que se envía al backend
 const formularioADatos = (esquema, formulario) => {
   const datos = {};
   esquema.forEach((_, index) => {
@@ -58,6 +55,46 @@ const formularioADatos = (esquema, formulario) => {
     datos[clave] = formulario[clave] ?? '';
   });
   return datos;
+};
+
+const ordenarArticulos = (articulos, esquema, campoIndex, direccion) => {
+  if (campoIndex === null || !esquema?.[campoIndex]) return articulos;
+
+  const campo = esquema[campoIndex];
+  const clave = claveIndice(campoIndex);
+
+  return [...articulos].sort((a, b) => {
+    const valA = a.datos?.[clave] ?? '';
+    const valB = b.datos?.[clave] ?? '';
+
+    // Vacíos siempre al final
+    if (valA === '' && valB !== '') return 1;
+    if (valB === '' && valA !== '') return -1;
+    if (valA === '' && valB === '') return 0;
+
+    let resultado = 0;
+
+    if (campo.tipo === 'number') {
+      resultado = parseFloat(valA) - parseFloat(valB);
+    } else if (campo.tipo === 'boolean') {
+      const numA = (valA === true || valA === 'true') ? 1 : 0;
+      const numB = (valB === true || valB === 'true') ? 1 : 0;
+      resultado = numB - numA; // Si primero por defecto
+    } else if (campo.tipo === 'date') {
+      resultado = new Date(valA) - new Date(valB);
+    } else {
+      resultado = String(valA).localeCompare(String(valB), 'es', { sensitivity: 'base' });
+    }
+
+    return direccion === 'asc' ? resultado : -resultado;
+  });
+};
+
+const etiquetaDireccion = (tipo, direccion) => {
+  if (tipo === 'number') return direccion === 'asc' ? '↑ Menor a Mayor' : '↓ Mayor a Menor';
+  if (tipo === 'boolean') return direccion === 'asc' ? '↑ Sí primero' : '↓ No primero';
+  if (tipo === 'date') return direccion === 'asc' ? '↑ Más antiguo' : '↓ Más reciente';
+  return direccion === 'asc' ? '↑ A → Z' : '↓ Z → A';
 };
 
 const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
@@ -68,6 +105,9 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
   const [imagenes, setImagenes] = useState([]);
   const [arrastrando, setArrastrando] = useState(false);
 
+  const [ordenCampoIndex, setOrdenCampoIndex] = useState(null);
+  const [ordenDireccion, setOrdenDireccion] = useState('asc');
+
   const [lightbox, setLightbox] = useState({ 
     activo: false, 
     listaImagenes: [], 
@@ -76,6 +116,12 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
 
   useEffect(() => {
     cargarArticulos();
+  }, [categoria]);
+
+  // Resetear orden al cambiar de categoría
+  useEffect(() => {
+    setOrdenCampoIndex(null);
+    setOrdenDireccion('asc');
   }, [categoria]);
 
   const cargarArticulos = async () => {
@@ -234,6 +280,9 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     }
   };
 
+  const articulosOrdenados = ordenarArticulos(articulos, categoria.esquema, ordenCampoIndex, ordenDireccion);
+  const campoOrdenActual = ordenCampoIndex !== null ? categoria.esquema?.[ordenCampoIndex] : null;
+
   return (
     <div className="dashboard-wrapper">
       <header className="dashboard-topbar">
@@ -255,11 +304,41 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
           </button>
         </div>
 
+        {/* Barra de ordenación — solo visible si hay artículos y campos */}
+        {articulos.length > 0 && categoria.esquema?.length > 0 && (
+          <div className="orden-barra">
+            <span className="orden-label">Ordenar por:</span>
+            <select
+              className="orden-select"
+              value={ordenCampoIndex ?? ''}
+              onChange={(e) => {
+                const val = e.target.value;
+                setOrdenCampoIndex(val === '' ? null : parseInt(val));
+                setOrdenDireccion('asc');
+              }}
+            >
+              <option value="">— Sin ordenar —</option>
+              {categoria.esquema.map((campo, idx) => (
+                <option key={idx} value={idx}>{campo.nombre}</option>
+              ))}
+            </select>
+
+            {ordenCampoIndex !== null && (
+              <button
+                className="btn-orden-direccion"
+                onClick={() => setOrdenDireccion(prev => prev === 'asc' ? 'desc' : 'asc')}
+              >
+                {etiquetaDireccion(campoOrdenActual?.tipo, ordenDireccion)}
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="categorias-list">
-          {articulos.length === 0 ? (
+          {articulosOrdenados.length === 0 ? (
             <p className="empty-state">No hay objetos en esta coleccion aun.</p>
           ) : (
-            articulos.map((art) => {
+            articulosOrdenados.map((art) => {
               const tieneImagenes = (art.imagen1 && art.imagen1 !== "") || (art.imagen2 && art.imagen2 !== "");
               return (
                 <div key={art.id} className="articulo-card">
