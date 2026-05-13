@@ -317,13 +317,13 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                 className={`btn-pestana ${pestanaActiva === 'COLECCION' ? 'activa' : ''}`}
                 onClick={() => setPestanaActiva('COLECCION')}
               >
-                🗂️ Mi Colección
+                Mi Colección
               </button>
               <button
                 className={`btn-pestana wishlist ${pestanaActiva === 'WISHLIST' ? 'activa wishlist-activa' : ''}`}
                 onClick={() => setPestanaActiva('WISHLIST')}
               >
-                ⭐ Wishlist
+                Wishlist
               </button>
             </div>
           </div>
