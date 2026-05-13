@@ -313,10 +313,10 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
             <h3 className="section-title">Inventario</h3>
           </div>
           <div className="topbar-actions">
-            <button className="btn-volver" onClick={() => descargarArchivo('csv')}>
+            <button className="btn-nueva-categoria" onClick={() => descargarArchivo('csv')}>
               Exportar CSV
             </button>
-            <button className="btn-volver" onClick={() => descargarArchivo('json')}>
+            <button className="btn-nueva-categoria" onClick={() => descargarArchivo('json')}>
               Exportar JSON
             </button>
             <button className="btn-nueva-categoria" onClick={abrirNuevoArticulo}>

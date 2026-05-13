@@ -63,7 +63,13 @@ public class ArticuloService {
     public String exportarComoJson(Integer categoriaId, Integer usuarioId) {
         List<Articulo> articulos = articuloRepository.findByCategoriaIdAndUsuarioId(categoriaId, usuarioId);
         try {
-            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(articulos);
+            List<Map<String, Object>> exportar = articulos.stream().map(art -> {
+                Map<String, Object> item = new java.util.LinkedHashMap<>();
+                item.put("id", art.getId());
+                item.put("datos", art.getDatos());
+                return item;
+            }).toList();
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(exportar);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al generar JSON");
         }

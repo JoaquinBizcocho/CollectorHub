@@ -671,6 +671,12 @@ textarea.input-base {
   flex-wrap: wrap;
 }
 
+.orden-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .orden-label {
   font-size: 0.9rem;
   font-weight: bold;
