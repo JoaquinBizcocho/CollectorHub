@@ -109,6 +109,18 @@ public class ArticuloService {
                                                  String jsonContent, boolean sobreescribir) {
         try {
             List<Map<String, Object>> items = objectMapper.readValue(jsonContent, List.class);
+
+            if (items == null || items.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "El fichero JSON está vacío o no tiene el formato correcto.");
+            }
+
+            Map<String, Object> primero = items.get(0);
+            if (!primero.containsKey("datos")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "El fichero JSON no tiene el formato correcto. Asegúrate de que fue exportado desde CollectorHub.");
+            }
+
             List<Articulo> existentes = articuloRepository.findByCategoriaIdAndUsuarioId(categoriaId, usuarioId);
             Set<Integer> idsExistentes = new HashSet<>();
             for (Articulo a : existentes) idsExistentes.add(a.getId());
@@ -161,8 +173,11 @@ public class ArticuloService {
             respuesta.put("requiereConfirmacion", false);
             return respuesta;
 
+        } catch (ResponseStatusException e) {
+            throw e;
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al procesar el JSON: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El fichero no tiene un formato JSON válido.");
         }
     }
 
@@ -170,9 +185,20 @@ public class ArticuloService {
                                                 String csvContent, boolean sobreescribir) {
         try {
             String[] lineas = csvContent.split("\n");
-            if (lineas.length < 2) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CSV vacío o sin datos.");
+            if (lineas.length < 2) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El fichero CSV está vacío o no tiene datos.");
+            }
 
             String[] cabeceras = lineas[0].trim().split(",");
+
+            boolean tieneId = Arrays.stream(cabeceras).anyMatch(c -> c.trim().equals("id"));
+            boolean tieneEstado = Arrays.stream(cabeceras).anyMatch(c -> c.trim().equals("estado"));
+
+            if (!tieneId || !tieneEstado) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "El fichero CSV no tiene el formato correcto. Asegúrate de que fue exportado desde CollectorHub.");
+            }
+
             List<Articulo> existentes = articuloRepository.findByCategoriaIdAndUsuarioId(categoriaId, usuarioId);
             Set<Integer> idsExistentes = new HashSet<>();
             for (Articulo a : existentes) idsExistentes.add(a.getId());
@@ -238,7 +264,8 @@ public class ArticuloService {
         } catch (ResponseStatusException e) {
             throw e;
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al procesar el CSV: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El fichero no tiene un formato CSV válido.");
         }
     }
 }
