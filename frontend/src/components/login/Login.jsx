@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import './Login.css';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const Login = ({ alIrARegistro, alEntrar }) => {
   const [alias, setAlias] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +22,7 @@ const Login = ({ alIrARegistro, alEntrar }) => {
     e.preventDefault();
 
     try {
-      const respuesta = await fetch('https://collectorhub-z5z2.onrender.com/api/auth/login', {
+      const respuesta = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ alias: alias, password: password })
