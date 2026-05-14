@@ -158,7 +158,7 @@ const PanelEstadisticas = ({ articulos, esquema }) => {
               <span className="stats-valor-grande">{calcularNumerico(campo)}</span>
             </div>
           ))}
-        </div> 
+        </div>
       )}
 
       {camposBooleanos.length > 0 && (
