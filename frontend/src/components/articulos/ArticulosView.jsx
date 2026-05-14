@@ -196,6 +196,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
   const [imagenes, setImagenes] = useState([]);
   const [arrastrando, setArrastrando] = useState(false);
   const [pestanaActiva, setPestanaActiva] = useState('COLECCION');
+  const [menuDatosAbierto, setMenuDatosAbierto] = useState(false);
 
   const [ordenCampoIndex, setOrdenCampoIndex] = useState(null);
   const [ordenDireccion, setOrdenDireccion] = useState('asc');
@@ -211,6 +212,15 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     setOrdenCampoIndex(null);
     setOrdenDireccion('asc');
   }, [categoria]);
+
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const cerrar = (e) => {
+      if (!e.target.closest('.dropdown-wrapper')) setMenuDatosAbierto(false);
+    };
+    document.addEventListener('mousedown', cerrar);
+    return () => document.removeEventListener('mousedown', cerrar);
+  }, []);
 
   const cargarArticulos = async () => {
     try {
@@ -351,51 +361,47 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     URL.revokeObjectURL(url);
   };
 
+  const importarArchivo = async (tipo) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = tipo === 'csv' ? '.csv' : '.json';
+    input.onchange = async (e) => {
+      const archivo = e.target.files[0];
+      if (!archivo) return;
+      const contenido = await archivo.text();
+      try {
+        const response = tipo === 'csv'
+          ? await articulosApi.importarCsv(categoria.id, contenido, false)
+          : await articulosApi.importarJson(categoria.id, contenido, false);
+        const data = await response.json();
+        if (data.requiereConfirmacion) {
+          const confirmar = window.confirm(
+            `${data.conflictos} artículo(s) del fichero ya existen en esta categoría.\n\n¿Quieres sobreescribirlos con los datos del fichero?`
+          );
+          if (confirmar) {
+            const response2 = tipo === 'csv'
+              ? await articulosApi.importarCsv(categoria.id, contenido, true)
+              : await articulosApi.importarJson(categoria.id, contenido, true);
+            const data2 = await response2.json();
+            alert(`Importación completada: ${data2.creados} creados, ${data2.actualizados} actualizados.`);
+          } else {
+            alert('Importación cancelada.');
+          }
+        } else {
+          alert(`Importación completada: ${data.creados} creados, ${data.actualizados} actualizados.`);
+        }
+        cargarArticulos();
+      } catch (error) {
+        alert('Error al importar el fichero. Comprueba que el formato es correcto.');
+        console.error(error);
+      }
+    };
+    input.click();
+  };
+
   const articulosOrdenados = ordenarArticulos(articulos, categoria.esquema, ordenCampoIndex, ordenDireccion);
   const articulosFiltrados = articulosOrdenados.filter(a => a.estado === pestanaActiva);
   const campoOrdenActual = ordenCampoIndex !== null ? categoria.esquema?.[ordenCampoIndex] : null;
-
-  const importarArchivo = async (tipo) => {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = tipo === 'csv' ? '.csv' : '.json';
-  input.onchange = async (e) => {
-    const archivo = e.target.files[0];
-    if (!archivo) return;
-    const contenido = await archivo.text();
-
-    try {
-      const response = tipo === 'csv'
-        ? await articulosApi.importarCsv(categoria.id, contenido, false)
-        : await articulosApi.importarJson(categoria.id, contenido, false);
-
-      const data = await response.json();
-
-      if (data.requiereConfirmacion) {
-        const confirmar = window.confirm(
-          `${data.conflictos} artículo(s) del fichero ya existen en esta categoría.\n\n¿Quieres sobreescribirlos con los datos del fichero?`
-        );
-        if (confirmar) {
-          const response2 = tipo === 'csv'
-            ? await articulosApi.importarCsv(categoria.id, contenido, true)
-            : await articulosApi.importarJson(categoria.id, contenido, true);
-          const data2 = await response2.json();
-          alert(`Importación completada: ${data2.creados} creados, ${data2.actualizados} actualizados.`);
-        } else {
-          alert('Importación cancelada.');
-        }
-      } else {
-        alert(`Importación completada: ${data.creados} creados, ${data.actualizados} actualizados.`);
-      }
-
-      cargarArticulos();
-    } catch (error) {
-      alert('Error al importar el fichero. Comprueba que el formato es correcto.');
-      console.error(error);
-    }
-  };
-  input.click();
-};
 
   return (
     <div className="dashboard-wrapper">
@@ -408,7 +414,6 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
       </header>
 
       <div className="articulos-layout">
-
         <div className="articulos-main">
           <div className="dashboard-header">
             <div className="header-titles">
@@ -425,10 +430,31 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
               </div>
             </div>
             <div className="topbar-actions">
-              <button className="btn-nueva-categoria" onClick={() => descargarArchivo('csv')}>Exportar CSV</button>
-              <button className="btn-nueva-categoria" onClick={() => descargarArchivo('json')}>Exportar JSON</button>
-              <button className="btn-nueva-categoria" onClick={() => importarArchivo('csv')}>Importar CSV</button>
-              <button className="btn-nueva-categoria" onClick={() => importarArchivo('json')}>Importar JSON</button>
+              <div className="dropdown-wrapper">
+                <button
+                  className="btn-nueva-categoria"
+                  onClick={() => setMenuDatosAbierto(prev => !prev)}
+                >
+                  Datos ▾
+                </button>
+                {menuDatosAbierto && (
+                  <div className="dropdown-menu">
+                    <button className="dropdown-item" onClick={() => { descargarArchivo('csv'); setMenuDatosAbierto(false); }}>
+                      ⬇️ Exportar CSV
+                    </button>
+                    <button className="dropdown-item" onClick={() => { descargarArchivo('json'); setMenuDatosAbierto(false); }}>
+                      ⬇️ Exportar JSON
+                    </button>
+                    <div className="dropdown-divider" />
+                    <button className="dropdown-item" onClick={() => { importarArchivo('csv'); setMenuDatosAbierto(false); }}>
+                      ⬆️ Importar CSV
+                    </button>
+                    <button className="dropdown-item" onClick={() => { importarArchivo('json'); setMenuDatosAbierto(false); }}>
+                      ⬆️ Importar JSON
+                    </button>
+                  </div>
+                )}
+              </div>
               <button className="btn-nueva-categoria" onClick={abrirNuevoArticulo}>+ Añadir Articulo</button>
             </div>
           </div>
@@ -518,7 +544,6 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
         <aside className="articulos-sidebar">
           <PanelEstadisticas articulos={articulos} esquema={categoria.esquema} />
         </aside>
-
       </div>
 
       {mostrarModal && (

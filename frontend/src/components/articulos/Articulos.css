@@ -32,6 +32,8 @@
   border-radius: 8px;
   font-size: 0.95rem;
   border: 1px solid var(--borde-input);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .dato-etiqueta {
@@ -123,6 +125,12 @@
   grid-template-columns: 1fr 1fr;
   gap: 15px;
   margin-bottom: 20px;
+  min-width: 0;
+}
+
+.campo-dinamico {
+  min-width: 0;
+  overflow: hidden;
 }
 
 .campo-dinamico label {
@@ -593,4 +601,50 @@
   color: #9e9e9e;
   text-align: center;
   margin: 0;
+}
+
+/* ===== DROPDOWN DATOS ===== */
+
+.dropdown-wrapper {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-tarjeta);
+  border: 1px solid var(--borde-input);
+  border-radius: 12px;
+  box-shadow: 0 8px 25px var(--sombra);
+  padding: 8px;
+  z-index: 100;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dropdown-item {
+  background: transparent;
+  border: none;
+  color: var(--texto-input);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: var(--bg-input);
+  color: #66bb6a;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: var(--borde-input);
+  margin: 4px 0;
 }
