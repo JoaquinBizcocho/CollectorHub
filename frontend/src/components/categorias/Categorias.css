@@ -216,6 +216,7 @@
   background: var(--bg-tarjeta); padding: 3rem; border-radius: 25px;
   width: 90%; max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
   max-height: 90vh; overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .modal-content h3 { 
@@ -331,6 +332,19 @@ textarea.input-base {
   border-radius: 12px; 
   font-weight: bold; 
   cursor: pointer; 
+}
+
+.campos-dinamicos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+  min-width: 0;
+}
+
+.campo-dinamico {
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* ===== SELECTOR DE RUTA (nueva categoría / desde plantilla) ===== */
