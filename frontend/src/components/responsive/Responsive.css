@@ -123,6 +123,31 @@
     position: static;
   }
 
+  /* Dropdown datos */
+  .dropdown-menu {
+    left: 0;
+    right: auto;
+    min-width: 160px;
+  }
+
+  /* Admin métricas */
+  .estadisticas-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Layout artículos en móvil */
+  .articulos-layout {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .articulos-sidebar {
+    width: 100%;
+    position: static;
+    margin-top: 0;
+  }
+
+
   /* 7. Lightbox flechas */
   .btn-flecha-lightbox.izq { left: 10px; }
   .btn-flecha-lightbox.der { right: 10px; }

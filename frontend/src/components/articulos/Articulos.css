@@ -612,7 +612,8 @@
 .dropdown-menu {
   position: absolute;
   top: calc(100% + 8px);
-  right: 0;
+  left: 0;
+  right: auto;
   background: var(--bg-tarjeta);
   border: 1px solid var(--borde-input);
   border-radius: 12px;
