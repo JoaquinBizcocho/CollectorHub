@@ -131,12 +131,13 @@
   transition: all 0.3s ease;
   width: 100%;
   box-sizing: border-box;
+
 }
 
 .categoria-card-horizontal:hover {
   transform: translateX(5px); 
   box-shadow: 0 8px 25px var(--sombra);
-  border-left: 5px solid #66bb6a; 
+  /* border-left: 5px solid #66bb6a;  */
 }
 
 .categoria-info h4 {
