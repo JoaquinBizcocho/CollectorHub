@@ -18,7 +18,7 @@ public class UsuarioController {
     @DeleteMapping("/cuenta")
     public ResponseEntity<String> eliminarCuenta(Authentication authentication) {
         AuthenticatedUser usuario = (AuthenticatedUser) authentication.getPrincipal();
-        usuarioRepository.deleteById(usuario.getId().intValue());
+        usuarioRepository.deleteById(usuario.getId());
         return ResponseEntity.ok("Cuenta eliminada correctamente.");
     }
 }

@@ -149,7 +149,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
                   <h4>Estructura de Datos Estándar</h4>
                   {esquema.map((campo, index) => (
                     <div key={index} className="esquema-row">
-                      <input type="text" placeholder="Ej: Condición PSA" value={campo.nombre} onChange={(e) => actualizarCampoEsquema(index, 'nombre', e.target.value)} />
+                      <input type="text" placeholder="Nombre (ej: Cartas Pokémon Oficial)" value={nombre} onChange={(e) => setNombre(e.target.value)} required className="input-base" maxLength={50} />
                       <select value={campo.tipo} onChange={(e) => actualizarCampoEsquema(index, 'tipo', e.target.value)}>
                         <option value="text">Texto Corto</option>
                         <option value="number">Número</option>

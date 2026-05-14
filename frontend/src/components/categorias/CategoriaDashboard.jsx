@@ -247,7 +247,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
                           placeholder="Ej: Valoracion"
                           value={campo.nombre}
                           onChange={(e) => actualizarCampoEsquema(index, 'nombre', e.target.value)}
-                          maxLength={30}
+                          maxLength={50}
                         />
                         <select value={campo.tipo} onChange={(e) => actualizarCampoEsquema(index, 'tipo', e.target.value)}>
                           <option value="text">Texto Corto</option>

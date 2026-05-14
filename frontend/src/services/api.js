@@ -67,6 +67,20 @@ export const articulosApi = {
   exportarCsv: (categoriaId) =>
     fetchConAuth(`${API_BASE}/api/articulos/categoria/${categoriaId}/exportar/csv`, { headers: headers() }),
 
+  importarJson: (categoriaId, jsonContent, sobreescribir = false) =>
+  fetchConAuth(`${API_BASE}/api/articulos/categoria/${categoriaId}/importar/json?sobreescribir=${sobreescribir}`, {
+    method: 'POST',
+    headers: { ...headers(), 'Content-Type': 'application/json' },
+    body: jsonContent
+  }),
+
+  importarCsv: (categoriaId, csvContent, sobreescribir = false) =>
+    fetchConAuth(`${API_BASE}/api/articulos/categoria/${categoriaId}/importar/csv?sobreescribir=${sobreescribir}`, {
+      method: 'POST',
+      headers: { ...headers(), 'Content-Type': 'text/plain' },
+      body: csvContent
+    }),
+
   crear: (data) =>
     fetchConAuth(`${API_BASE}/api/articulos`, {
       method: 'POST',

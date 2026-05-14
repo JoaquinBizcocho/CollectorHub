@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/articulos")
@@ -52,6 +53,30 @@ public class ArticuloController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"coleccion_" + categoriaId + ".csv\"")
                 .contentType(MediaType.parseMediaType("text/csv"))
                 .body(csv);
+    }
+
+    @PostMapping("/categoria/{categoriaId}/importar/json")
+    public ResponseEntity<Map<String, Object>> importarJson(
+            @PathVariable Integer categoriaId,
+            @RequestParam(defaultValue = "false") boolean sobreescribir,
+            @RequestBody String jsonContent,
+            Authentication authentication) {
+        AuthenticatedUser usuario = (AuthenticatedUser) authentication.getPrincipal();
+        Map<String, Object> resultado = articuloService.importarDesdeJson(
+                categoriaId, usuario.getId(), jsonContent, sobreescribir);
+        return ResponseEntity.ok(resultado);
+    }
+
+    @PostMapping("/categoria/{categoriaId}/importar/csv")
+    public ResponseEntity<Map<String, Object>> importarCsv(
+            @PathVariable Integer categoriaId,
+            @RequestParam(defaultValue = "false") boolean sobreescribir,
+            @RequestBody String csvContent,
+            Authentication authentication) {
+        AuthenticatedUser usuario = (AuthenticatedUser) authentication.getPrincipal();
+        Map<String, Object> resultado = articuloService.importarDesdeCsv(
+                categoriaId, usuario.getId(), csvContent, sobreescribir);
+        return ResponseEntity.ok(resultado);
     }
 
     @PostMapping

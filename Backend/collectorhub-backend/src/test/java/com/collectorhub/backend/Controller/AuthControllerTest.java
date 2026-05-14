@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
@@ -57,6 +57,6 @@ public class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(bodyJson))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.mensaje").value("Cuenta inactiva. Verifica tu correo electronico primero."));
+                .andExpect(content().string("Cuenta inactiva. Verifica tu correo electrónico primero."));
     }
 }

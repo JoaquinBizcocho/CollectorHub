@@ -9,8 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ArticuloService {
@@ -66,7 +65,7 @@ public class ArticuloService {
         List<Articulo> articulos = articuloRepository.findByCategoriaIdAndUsuarioId(categoriaId, usuarioId);
         try {
             List<Map<String, Object>> exportar = articulos.stream().map(art -> {
-                Map<String, Object> item = new java.util.LinkedHashMap<>();
+                Map<String, Object> item = new LinkedHashMap<>();
                 item.put("id", art.getId());
                 item.put("estado", art.getEstado());
                 item.put("datos", art.getDatos());
@@ -104,5 +103,142 @@ public class ArticuloService {
         }
 
         return sb.toString();
+    }
+
+    public Map<String, Object> importarDesdeJson(Integer categoriaId, Integer usuarioId,
+                                                 String jsonContent, boolean sobreescribir) {
+        try {
+            List<Map<String, Object>> items = objectMapper.readValue(jsonContent, List.class);
+            List<Articulo> existentes = articuloRepository.findByCategoriaIdAndUsuarioId(categoriaId, usuarioId);
+            Set<Integer> idsExistentes = new HashSet<>();
+            for (Articulo a : existentes) idsExistentes.add(a.getId());
+
+            List<Integer> conflictos = new ArrayList<>();
+            for (Map<String, Object> item : items) {
+                Object idObj = item.get("id");
+                if (idObj != null) {
+                    Integer id = ((Number) idObj).intValue();
+                    if (idsExistentes.contains(id)) conflictos.add(id);
+                }
+            }
+
+            if (!conflictos.isEmpty() && !sobreescribir) {
+                Map<String, Object> respuesta = new LinkedHashMap<>();
+                respuesta.put("conflictos", conflictos.size());
+                respuesta.put("requiereConfirmacion", true);
+                return respuesta;
+            }
+
+            int creados = 0, actualizados = 0;
+            for (Map<String, Object> item : items) {
+                Object idObj = item.get("id");
+                Integer id = idObj != null ? ((Number) idObj).intValue() : null;
+                String estado = item.get("estado") != null ? item.get("estado").toString() : "COLECCION";
+                Map<String, Object> datos = (Map<String, Object>) item.get("datos");
+
+                if (id != null && idsExistentes.contains(id) && sobreescribir) {
+                    Articulo art = articuloRepository.findById(id).orElse(null);
+                    if (art != null && art.getUsuarioId().equals(usuarioId)) {
+                        art.setEstado(estado);
+                        art.setDatos(datos);
+                        articuloRepository.save(art);
+                        actualizados++;
+                    }
+                } else if (id == null || !idsExistentes.contains(id)) {
+                    Articulo nuevo = new Articulo();
+                    nuevo.setCategoriaId(categoriaId);
+                    nuevo.setUsuarioId(usuarioId);
+                    nuevo.setEstado(estado);
+                    nuevo.setDatos(datos);
+                    articuloRepository.save(nuevo);
+                    creados++;
+                }
+            }
+
+            Map<String, Object> respuesta = new LinkedHashMap<>();
+            respuesta.put("creados", creados);
+            respuesta.put("actualizados", actualizados);
+            respuesta.put("requiereConfirmacion", false);
+            return respuesta;
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al procesar el JSON: " + e.getMessage());
+        }
+    }
+
+    public Map<String, Object> importarDesdeCsv(Integer categoriaId, Integer usuarioId,
+                                                String csvContent, boolean sobreescribir) {
+        try {
+            String[] lineas = csvContent.split("\n");
+            if (lineas.length < 2) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CSV vacío o sin datos.");
+
+            String[] cabeceras = lineas[0].trim().split(",");
+            List<Articulo> existentes = articuloRepository.findByCategoriaIdAndUsuarioId(categoriaId, usuarioId);
+            Set<Integer> idsExistentes = new HashSet<>();
+            for (Articulo a : existentes) idsExistentes.add(a.getId());
+
+            List<Integer> conflictos = new ArrayList<>();
+            List<String[]> filas = new ArrayList<>();
+
+            for (int i = 1; i < lineas.length; i++) {
+                if (lineas[i].trim().isEmpty()) continue;
+                String[] cols = lineas[i].trim().split(",", -1);
+                filas.add(cols);
+                if (cols.length > 0 && !cols[0].isEmpty()) {
+                    try {
+                        Integer id = Integer.parseInt(cols[0].trim());
+                        if (idsExistentes.contains(id)) conflictos.add(id);
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+
+            if (!conflictos.isEmpty() && !sobreescribir) {
+                Map<String, Object> respuesta = new LinkedHashMap<>();
+                respuesta.put("conflictos", conflictos.size());
+                respuesta.put("requiereConfirmacion", true);
+                return respuesta;
+            }
+
+            int creados = 0, actualizados = 0;
+            for (String[] cols : filas) {
+                Integer id = null;
+                try { id = Integer.parseInt(cols[0].trim()); } catch (NumberFormatException ignored) {}
+                String estado = cols.length > 1 ? cols[1].trim() : "COLECCION";
+
+                Map<String, Object> datos = new LinkedHashMap<>();
+                for (int c = 2; c < cabeceras.length && c < cols.length; c++) {
+                    datos.put(cabeceras[c].trim(), cols[c].trim());
+                }
+
+                if (id != null && idsExistentes.contains(id) && sobreescribir) {
+                    Articulo art = articuloRepository.findById(id).orElse(null);
+                    if (art != null && art.getUsuarioId().equals(usuarioId)) {
+                        art.setEstado(estado);
+                        art.setDatos(datos);
+                        articuloRepository.save(art);
+                        actualizados++;
+                    }
+                } else {
+                    Articulo nuevo = new Articulo();
+                    nuevo.setCategoriaId(categoriaId);
+                    nuevo.setUsuarioId(usuarioId);
+                    nuevo.setEstado(estado);
+                    nuevo.setDatos(datos);
+                    articuloRepository.save(nuevo);
+                    creados++;
+                }
+            }
+
+            Map<String, Object> respuesta = new LinkedHashMap<>();
+            respuesta.put("creados", creados);
+            respuesta.put("actualizados", actualizados);
+            respuesta.put("requiereConfirmacion", false);
+            return respuesta;
+
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al procesar el CSV: " + e.getMessage());
+        }
     }
 }

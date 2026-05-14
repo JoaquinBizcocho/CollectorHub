@@ -355,6 +355,48 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
   const articulosFiltrados = articulosOrdenados.filter(a => a.estado === pestanaActiva);
   const campoOrdenActual = ordenCampoIndex !== null ? categoria.esquema?.[ordenCampoIndex] : null;
 
+  const importarArchivo = async (tipo) => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = tipo === 'csv' ? '.csv' : '.json';
+  input.onchange = async (e) => {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
+    const contenido = await archivo.text();
+
+    try {
+      const response = tipo === 'csv'
+        ? await articulosApi.importarCsv(categoria.id, contenido, false)
+        : await articulosApi.importarJson(categoria.id, contenido, false);
+
+      const data = await response.json();
+
+      if (data.requiereConfirmacion) {
+        const confirmar = window.confirm(
+          `${data.conflictos} artículo(s) del fichero ya existen en esta categoría.\n\n¿Quieres sobreescribirlos con los datos del fichero?`
+        );
+        if (confirmar) {
+          const response2 = tipo === 'csv'
+            ? await articulosApi.importarCsv(categoria.id, contenido, true)
+            : await articulosApi.importarJson(categoria.id, contenido, true);
+          const data2 = await response2.json();
+          alert(`Importación completada: ${data2.creados} creados, ${data2.actualizados} actualizados.`);
+        } else {
+          alert('Importación cancelada.');
+        }
+      } else {
+        alert(`Importación completada: ${data.creados} creados, ${data.actualizados} actualizados.`);
+      }
+
+      cargarArticulos();
+    } catch (error) {
+      alert('Error al importar el fichero. Comprueba que el formato es correcto.');
+      console.error(error);
+    }
+  };
+  input.click();
+};
+
   return (
     <div className="dashboard-wrapper">
       <header className="dashboard-topbar">
@@ -385,6 +427,8 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
             <div className="topbar-actions">
               <button className="btn-nueva-categoria" onClick={() => descargarArchivo('csv')}>Exportar CSV</button>
               <button className="btn-nueva-categoria" onClick={() => descargarArchivo('json')}>Exportar JSON</button>
+              <button className="btn-nueva-categoria" onClick={() => importarArchivo('csv')}>Importar CSV</button>
+              <button className="btn-nueva-categoria" onClick={() => importarArchivo('json')}>Importar JSON</button>
               <button className="btn-nueva-categoria" onClick={abrirNuevoArticulo}>+ Añadir Articulo</button>
             </div>
           </div>
