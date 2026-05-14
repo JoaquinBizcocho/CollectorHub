@@ -130,6 +130,10 @@
   margin-bottom: 5px;
   color: #66bb6a;
   font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .zona-imagenes {
