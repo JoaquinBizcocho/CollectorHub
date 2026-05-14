@@ -37,6 +37,11 @@
 .dato-etiqueta {
   font-weight: bold;
   color: #66bb6a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+  display: inline-block;
 }
 
 .dato-valor {
@@ -366,6 +371,7 @@
   font-size: 0.9rem;
   cursor: pointer;
   outline: none;
+  max-width: 200px;
 }
 
 .orden-select:focus {
@@ -503,6 +509,10 @@
   font-size: 0.9rem;
   color: var(--texto-input);
   opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
 }
 
 .stats-valor {
