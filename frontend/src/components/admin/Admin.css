@@ -6,6 +6,8 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .estadistica-card {
@@ -29,4 +31,10 @@
   font-size: 3rem;
   font-weight: 900;
   color: #ffb300;
+}
+
+@media (max-width: 768px) {
+  .estadisticas-grid {
+    grid-template-columns: 1fr;
+  }
 }

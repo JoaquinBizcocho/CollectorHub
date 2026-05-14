@@ -440,17 +440,17 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                 {menuDatosAbierto && (
                   <div className="dropdown-menu">
                     <button className="dropdown-item" onClick={() => { descargarArchivo('csv'); setMenuDatosAbierto(false); }}>
-                      ⬇️ Exportar CSV
+                      Exportar CSV
                     </button>
                     <button className="dropdown-item" onClick={() => { descargarArchivo('json'); setMenuDatosAbierto(false); }}>
-                      ⬇️ Exportar JSON
+                      Exportar JSON
                     </button>
                     <div className="dropdown-divider" />
                     <button className="dropdown-item" onClick={() => { importarArchivo('csv'); setMenuDatosAbierto(false); }}>
-                      ⬆️ Importar CSV
+                      Importar CSV
                     </button>
                     <button className="dropdown-item" onClick={() => { importarArchivo('json'); setMenuDatosAbierto(false); }}>
-                      ⬆️ Importar JSON
+                      Importar JSON
                     </button>
                   </div>
                 )}
