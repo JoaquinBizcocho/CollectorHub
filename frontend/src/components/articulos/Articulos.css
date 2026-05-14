@@ -34,6 +34,9 @@
   border: 1px solid var(--borde-input);
   min-width: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .dato-etiqueta {
@@ -49,6 +52,8 @@
 .dato-valor {
   word-break: break-word;
   overflow-wrap: break-word;
+  color: var(--texto-input);
+  font-size: 1rem;
 }
 
 .articulo-acciones-vertical {
