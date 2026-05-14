@@ -453,6 +453,7 @@
   flex-shrink: 0;
   position: sticky;
   top: 2rem;
+  margin-top: 5rem;
 }
 
 /* ===== PANEL ESTADÍSTICAS ===== */
