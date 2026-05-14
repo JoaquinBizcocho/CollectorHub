@@ -234,7 +234,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
               <div className="modal-content">
                 <h3>{idEditando ? 'Editar Categoria' : 'Crear Nueva Categoria'}</h3>
                 <form onSubmit={guardarCategoria}>
-                  <input type="text" placeholder="Nombre (ej: Cartas Pokemon)" value={nombre} onChange={(e) => setNombre(e.target.value)} required className="input-base" />
+                  <input type="text" placeholder="Nombre (ej: Cartas Pokemon)" value={nombre} onChange={(e) => setNombre(e.target.value)} required className="input-base" maxLength={50} />
                   <textarea placeholder="Descripcion breve..." value={descripcion} onChange={(e) => setDescripcion(e.target.value)} className="input-base" />
 
                   <div className="esquema-builder">
@@ -242,7 +242,13 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
                     <p className="hint">Define que datos quieres guardar para estos objetos.</p>
                     {esquema.map((campo, index) => (
                       <div key={index} className="esquema-row">
-                        <input type="text" placeholder="Ej: Valoracion" value={campo.nombre} onChange={(e) => actualizarCampoEsquema(index, 'nombre', e.target.value)} />
+                        <input
+                          type="text"
+                          placeholder="Ej: Valoracion"
+                          value={campo.nombre}
+                          onChange={(e) => actualizarCampoEsquema(index, 'nombre', e.target.value)}
+                          maxLength={30}
+                        />
                         <select value={campo.tipo} onChange={(e) => actualizarCampoEsquema(index, 'tipo', e.target.value)}>
                           <option value="text">Texto Corto</option>
                           <option value="number">Numero</option>
