@@ -127,22 +127,22 @@ const PanelEstadisticas = ({ articulos, esquema }) => {
 
   return (
     <div className="stats-panel">
-      <h3 className="stats-titulo">📊 Estadísticas</h3>
+      <h3 className="stats-titulo">Estadísticas</h3>
 
       <div className="stats-seccion">
         <div className="stats-fila">
-          <span className="stats-label">🗂️ En colección</span>
+          <span className="stats-label">En colección</span>
           <span className="stats-valor">{coleccion.length}</span>
         </div>
         <div className="stats-fila">
-          <span className="stats-label">⭐ Deseados</span>
+          <span className="stats-label">Deseados</span>
           <span className="stats-valor stats-valor-wishlist">{wishlist.length}</span>
         </div>
       </div>
 
       {camposNumericos.length > 0 && (
         <div className="stats-seccion">
-          <p className="stats-subtitulo">Campos numéricos</p>
+          <p className="stats-subtitulo">Campos numéricos (Mi Collecion)</p>
           {camposNumericos.map(campo => (
             <div key={campo.idx} className="stats-numerico">
               <div className="stats-numerico-header">
@@ -152,7 +152,7 @@ const PanelEstadisticas = ({ articulos, esquema }) => {
                   onClick={() => toggleModo(campo.idx)}
                   title="Cambiar entre Suma y Media"
                 >
-                  {(modoNumerico[campo.idx] || 'suma') === 'suma' ? 'Σ Suma' : 'x̄ Media'}
+                  {(modoNumerico[campo.idx] || 'suma') === 'suma' ? 'Suma' : 'Media'}
                 </button>
               </div>
               <span className="stats-valor-grande">{calcularNumerico(campo)}</span>
@@ -163,7 +163,7 @@ const PanelEstadisticas = ({ articulos, esquema }) => {
 
       {camposBooleanos.length > 0 && (
         <div className="stats-seccion">
-          <p className="stats-subtitulo">Campos Sí / No</p>
+          <p className="stats-subtitulo">Campos Sí / No (Mi Collecion)</p>
           {camposBooleanos.map(campo => {
             const clave = claveIndice(campo.idx);
             const si = coleccion.filter(a => a.datos?.[clave] === true || a.datos?.[clave] === 'true').length;
