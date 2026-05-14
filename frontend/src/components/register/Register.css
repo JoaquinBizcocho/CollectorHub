@@ -145,19 +145,17 @@
   cursor: not-allowed;
 }
 
-/* =========================================
-   RESPONSIVE DESIGN - MOBILE (Añadido al final)
-   ========================================= */
+
 @media (max-width: 768px) {
   .register-card {
-    width: 90%; /* Quitamos los 500px fijos */
+    width: 90%; 
     max-width: 400px;
-    padding: 2rem 1.5rem; /* Reducimos el relleno interior */
+    padding: 2rem 1.5rem; 
     border-radius: 20px;
   }
 
   .register-card h1 {
-    font-size: 2.2rem; /* Título adaptado a móvil */
+    font-size: 2.2rem; 
   }
 
   .register-subtitle {

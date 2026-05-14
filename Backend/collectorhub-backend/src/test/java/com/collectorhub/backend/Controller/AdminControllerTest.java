@@ -21,9 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AdminControllerTest {
 
     @Autowired
-    private MockMvc mockMvc; // Esto simula ser Postman o el navegador
+    private MockMvc mockMvc;
 
-    // MockBean crea repositorios "de mentira" (dobles de acción)
     @MockitoBean
     private UsuarioRepository usuarioRepository;
 

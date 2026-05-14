@@ -49,11 +49,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // 1. ¿Quién puede entrar? (Tu Vercel y tu Localhost para cuando programes)
         configuration.setAllowedOrigins(Arrays.asList(
                 "https://collector-hub-frontend.vercel.app",
-                "http://localhost:5173", // Por si usas Vite en local
-                "http://localhost:3000"  // Por si usas React/Next en local
+                "http://localhost:5173",
+                "http://localhost:3000"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

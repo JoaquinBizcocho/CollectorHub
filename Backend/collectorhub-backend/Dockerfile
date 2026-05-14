@@ -11,8 +11,7 @@ COPY src ./src
 # Usamos -DskipTests para evitar que falle intentando conectarse a la base de datos durante la compilación
 RUN mvn clean package -DskipTests
 
-# Etapa 2: Ejecución (Producción)
-# Usamos una imagen mucho más ligera que solo tiene Java 21 (sin Maven)
+# Usamos una imagen mucho más ligera que solo tiene Java 21
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 

@@ -167,7 +167,7 @@ public class AuthController {
 
 
     // SCHEDULER: limpieza automática cada minuto
-    @Scheduled(fixedRate = 60000) // se ejecuta cada 60 segundos
+    @Scheduled(fixedRate = 60000)
     public void limpiarCuentasNoVerificadas() {
         LocalDateTime hace5Minutos = LocalDateTime.now().minusMinutes(5);
         List<Usuario> expirados = usuarioRepository

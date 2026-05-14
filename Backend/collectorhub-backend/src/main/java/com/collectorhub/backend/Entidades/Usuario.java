@@ -22,25 +22,23 @@ public class Usuario {
 
     private String rol;
 
-    // --- NUEVOS CAMPOS PARA EL PIN ---
+
     @Column(nullable = false)
     private boolean cuentaActiva = false; // Por defecto es falsa
 
     @Column(length = 6)
     private String codigoVerificacion; // Aquí guardamos el PIN temporal
 
-    // para el scheduler de 5 minutos
+
     @Column
     private LocalDateTime fechaRegistro;
 
-    // para limitar intentos de PIN
+
     @Column(nullable = false)
     private int intentosFallidos = 0;
 
 
     public Usuario() {}
-
-    // --- GETTERS Y SETTERS ---
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

@@ -75,7 +75,7 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
 
   const eliminarCuenta = async () => {
     const primerConfirm = window.confirm(
-      "⚠️ ¿Estás seguro de que quieres eliminar tu cuenta?\n\nSe borrarán TODOS tus datos: categorías, artículos e imágenes. Esta acción es irreversible."
+      "¿Estás seguro de que quieres eliminar tu cuenta?\n\nSe borrarán TODOS tus datos: categorías, artículos e imágenes. Esta acción es irreversible."
     );
     if (!primerConfirm) return;
 

@@ -28,7 +28,7 @@ public class CategoriaService {
         Categoria categoria = new Categoria();
         categoria.setNombre(dto.getNombre());
         categoria.setDescripcion(dto.getDescripcion());
-        categoria.setUsuarioId(usuarioId); // Siempre del token, nunca del body
+        categoria.setUsuarioId(usuarioId);
         categoria.setEsquema(dto.getEsquema());
         categoria.setEsOficial(dto.getEsOficial() != null ? dto.getEsOficial() : false);
         return categoriaRepository.save(categoria);
