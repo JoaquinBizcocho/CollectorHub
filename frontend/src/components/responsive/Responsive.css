@@ -109,7 +109,7 @@
 
   /* 6. Panel de Administración (Estadísticas) */
   .estadisticas-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 
   /* Layout artículos en móvil */
