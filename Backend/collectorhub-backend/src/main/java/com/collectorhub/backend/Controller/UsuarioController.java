@@ -15,8 +15,10 @@ public class UsuarioController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    // Elimina la cuenta del usuario autenticado, junto con todos sus datos en cascada
     @DeleteMapping("/cuenta")
     public ResponseEntity<String> eliminarCuenta(Authentication authentication) {
+        // Sacamos el id del token para asegurarnos de que cada usuario solo puede borrarse a sí mismo
         AuthenticatedUser usuario = (AuthenticatedUser) authentication.getPrincipal();
         usuarioRepository.deleteById(usuario.getId());
         return ResponseEntity.ok("Cuenta eliminada correctamente.");

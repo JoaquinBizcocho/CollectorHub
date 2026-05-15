@@ -54,8 +54,12 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
 
   const borrarPlantilla = async (id) => {
     if (window.confirm("¿Borrar esta plantilla oficial?")) {
-      await categoriasApi.eliminar(id);
-      cargarPlantillas();
+      try {
+        await categoriasApi.eliminar(id);
+        cargarPlantillas();
+      } catch (error) {
+        console.error("Error al borrar la plantilla", error);
+      }
     }
   };
 
@@ -142,15 +146,37 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
             <div className="modal-content">
               <h3>Crear Plantilla Oficial</h3>
               <form onSubmit={guardarPlantilla}>
-                <input type="text" placeholder="Nombre (ej: Cartas Pokémon Oficial)" value={nombre} onChange={(e) => setNombre(e.target.value)} required className="input-base" />
-                <textarea placeholder="Descripción breve..." value={descripcion} onChange={(e) => setDescripcion(e.target.value)} className="input-base" />
+                <input
+                  type="text"
+                  placeholder="Nombre (ej: Cartas Pokémon Oficial)"
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  required
+                  className="input-base"
+                  maxLength={50}
+                />
+                <textarea
+                  placeholder="Descripción breve..."
+                  value={descripcion}
+                  onChange={(e) => setDescripcion(e.target.value)}
+                  className="input-base"
+                />
 
                 <div className="esquema-builder">
                   <h4>Estructura de Datos Estándar</h4>
                   {esquema.map((campo, index) => (
                     <div key={index} className="esquema-row">
-                      <input type="text" placeholder="Nombre (ej: Cartas Pokémon Oficial)" value={nombre} onChange={(e) => setNombre(e.target.value)} required className="input-base" maxLength={50} />
-                      <select value={campo.tipo} onChange={(e) => actualizarCampoEsquema(index, 'tipo', e.target.value)}>
+                      <input
+                        type="text"
+                        placeholder="Ej: Condición PSA"
+                        value={campo.nombre}
+                        onChange={(e) => actualizarCampoEsquema(index, 'nombre', e.target.value)}
+                        maxLength={30}
+                      />
+                      <select
+                        value={campo.tipo}
+                        onChange={(e) => actualizarCampoEsquema(index, 'tipo', e.target.value)}
+                      >
                         <option value="text">Texto Corto</option>
                         <option value="number">Número</option>
                         <option value="boolean">Sí / No</option>

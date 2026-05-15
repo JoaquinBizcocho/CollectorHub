@@ -22,9 +22,11 @@ public class AdminController {
     @Autowired
     private ArticuloRepository articuloRepository;
 
+    //Devuelve las estadisticas globales del sistema para el panel de admin
     @GetMapping("/estadisticas")
     public ResponseEntity<Map<String, Long>> obtenerEstadisticas() {
         Map<String, Long> stats = new HashMap<>();
+        //Contamos directamente desde cada repositorio
         stats.put("totalUsuarios", usuarioRepository.count());
         stats.put("totalCategorias", categoriaRepository.count());
         stats.put("totalArticulos", articuloRepository.count());

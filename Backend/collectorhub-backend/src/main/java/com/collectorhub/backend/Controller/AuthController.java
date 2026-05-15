@@ -36,21 +36,24 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // LOGIN
 
+    //Comprueba las credenciales y devuelve un token JWT si son correctas
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO credenciales) {
+        //Buscamos el usuario por el alias en la base de datos
         Optional<Usuario> optionalUser = usuarioRepository.findByAlias(credenciales.getAlias());
 
         if (optionalUser.isPresent()) {
             Usuario user = optionalUser.get();
+            //Comparamos la contraseña recibida con el hash almacenado
             if (passwordEncoder.matches(credenciales.getPassword(), user.getPassword())) {
-
+                //Si el usuario no se ha verificado todavia el email no puede entrar
                 if (!user.isCuentaActiva()) {
                     return ResponseEntity.status(HttpStatus.FORBIDDEN)
                             .body("Cuenta inactiva. Verifica tu correo electrónico primero.");
                 }
 
+                //Montamos la respuesta con el Token JWT y los datos basicos del usuario
                 AuthResponseDTO respuesta = new AuthResponseDTO();
                 respuesta.setMensaje("Acceso concedido");
                 respuesta.setUsuarioId(user.getId());
@@ -60,16 +63,17 @@ public class AuthController {
                 return ResponseEntity.ok(respuesta);
             }
         }
+        //Si el alias o la contraseña no existe no coinciden o no existen devolvemos un mensaje generico
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas.");
     }
 
 
-    // REGISTRO
-
+    //Registra un nuevo usuario validando el formato del correo y contraseña
+    //Genera un PIN de verificacion y lo manda por email
     @PostMapping("/register")
     public ResponseEntity<String> registrarUsuario(@RequestBody RegistroRequestDTO registroDTO) {
 
-        // 1. Validación de formatos
+        // Validamos formato de correo y contraseña con regex antes de hacer nada
         String regexCorreo = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
         String regexPassword = "^(?=.*[0-9])(?=.*[!@#$%^&*(),.?\":{}|<>]).{8,}$";
 
@@ -82,7 +86,7 @@ public class AuthController {
                     .body("Error: Contraseña poco segura. Debe tener mínimo 8 caracteres, al menos un número y al menos un símbolo (!@#$%^&*...).");
         }
 
-        // 2. Comprobación de duplicados (alias Y correo)
+        // Comprobamos que el alias y el correo no esten en uso ya
         if (usuarioRepository.findByAlias(registroDTO.getAlias()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Error: El alias '" + registroDTO.getAlias() + "' ya está en uso.");
@@ -93,7 +97,7 @@ public class AuthController {
                     .body("Error: Ya existe una cuenta registrada con ese correo electrónico.");
         }
 
-        // 3. Crear y guardar usuario temporal
+        // Creamos el usuario con la cuenta inactiva hasta que verifique el PIN
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setAlias(registroDTO.getAlias());
         nuevoUsuario.setCorreoElectronico(registroDTO.getCorreoElectronico());
@@ -103,12 +107,13 @@ public class AuthController {
         nuevoUsuario.setFechaRegistro(LocalDateTime.now());
         nuevoUsuario.setIntentosFallidos(0);
 
+        //Generamos un PIN de 6 digitos aleatorio y lo guardamos en el usuario
         String pin = String.format("%06d", new SecureRandom().nextInt(1000000));
         nuevoUsuario.setCodigoVerificacion(pin);
 
         usuarioRepository.save(nuevoUsuario);
 
-        // 4. Intentar envío de correo
+        // Intentamos mandar el PIN por correo, si falla borramos el usuario
         try {
             emailService.enviarCorreoAPI(nuevoUsuario.getCorreoElectronico(), nuevoUsuario.getAlias(), pin);
         } catch (Exception e) {
@@ -121,7 +126,7 @@ public class AuthController {
     }
 
 
-    // VERIFICACIÓN DE PIN
+    // Recibe el PIN que el usuario introduce y activa la cuenta si es correcto
 
     @PostMapping("/verify-pin")
     public ResponseEntity<String> verificarPin(@RequestBody PinRequestDTO datos) {
@@ -133,7 +138,7 @@ public class AuthController {
 
         Usuario u = usuarioOpt.get();
 
-        // Comprobar si el PIN ya expiró (cuenta eliminada por scheduler o fecha pasada)
+        // Si han pasado mas de 5 min desde el registro el PIN caduca y borramos el usuario
         if (u.getFechaRegistro() != null &&
                 u.getFechaRegistro().plusMinutes(5).isBefore(LocalDateTime.now())) {
             usuarioRepository.delete(u);
@@ -141,13 +146,14 @@ public class AuthController {
                     .body("El PIN ha caducado. Tu registro ha sido eliminado. Vuelve a registrarte.");
         }
 
-        // comprobar si superó los intentos máximos
+        // Si ya agotó los 3 intentos borramos el usuario por seguridad
         if (u.getIntentosFallidos() >= MAX_INTENTOS_PIN) {
             usuarioRepository.delete(u);
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                     .body("Demasiados intentos fallidos. Tu registro ha sido eliminado por seguridad. Vuelve a registrarte.");
         }
 
+        //Pin correcto, activamos la cuenta y limpiamos los campos temporales
         if (u.getCodigoVerificacion() != null && u.getCodigoVerificacion().equals(datos.getPin())) {
             u.setCuentaActiva(true);
             u.setCodigoVerificacion(null);
@@ -156,7 +162,7 @@ public class AuthController {
             return ResponseEntity.ok("Cuenta verificada correctamente.");
         }
 
-        // PIN incorrecto: sumar intento fallido
+        // Si el PIN es incorrecto sumamos un intento y avisamos cuantos quedan
         u.setIntentosFallidos(u.getIntentosFallidos() + 1);
         int intentosRestantes = MAX_INTENTOS_PIN - u.getIntentosFallidos();
         usuarioRepository.save(u);
@@ -166,7 +172,7 @@ public class AuthController {
     }
 
 
-    // SCHEDULER: limpieza automática cada minuto
+    // Se ejecuta cada minuto buscando usuarios sin verificar cuyo registro tenga mas de 5 min y los elimina de la base de datos.
     @Scheduled(fixedRate = 60000)
     public void limpiarCuentasNoVerificadas() {
         LocalDateTime hace5Minutos = LocalDateTime.now().minusMinutes(5);
