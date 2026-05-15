@@ -19,8 +19,10 @@ const CategoriasDashboard = ({ alCerrarSesion, alAbrirCategoria, alIrAdmin }) =>
   try {
     const token = localStorage.getItem('token');
     if (!token) return 'user';
+
     const payload = JSON.parse(atob(token.split('.')[1]));
     return payload.rol || 'user';
+    
   } catch (e) { return 'user'; }
 })();
 
