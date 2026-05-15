@@ -39,7 +39,6 @@ const Login = ({ alIrARegistro, alEntrar }) => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuarioId', data.usuarioId);
         localStorage.setItem('alias', alias);
-        localStorage.setItem('rol', data.rol);
 
         setMensaje("¡Acceso correcto! Entrando...");
         setTimeout(() => { alEntrar(); }, 1000);

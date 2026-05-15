@@ -31,7 +31,6 @@ function App() {
   const cerrarSesion = () => {
     localStorage.removeItem('usuarioId');
     localStorage.removeItem('alias');
-    localStorage.removeItem('rol');
     localStorage.removeItem('token');
     setCategoriaSeleccionada(null);
     setVistaActual('login');
