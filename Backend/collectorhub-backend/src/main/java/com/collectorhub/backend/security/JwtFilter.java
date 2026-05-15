@@ -39,6 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 String roleGranted = (rol != null && rol.contains("admin")) ? "ROLE_ADMIN" : "ROLE_USER";
 
                 // Guardamos el usuario autenticado completo (con id) como principal
+
                 AuthenticatedUser principal = new AuthenticatedUser(usuarioId, alias, rol);
 
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(

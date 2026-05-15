@@ -26,7 +26,7 @@ public class JwtUtil {
                 .claim("id", usuarioId)
                 .claim("rol", rol)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // Caduca en 1 día
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
