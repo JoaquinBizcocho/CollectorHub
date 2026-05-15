@@ -7,6 +7,18 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import { setSesionExpiradaCallback } from './services/api';
 import "./App.css"
 
+// Lee el rol directamente del JWT sin fiarse del localStorage
+const getRolDesdeToken = () => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.rol || null;
+  } catch (e) {
+    return null;
+  }
+};
+
 function App() {
 
   const [vistaActual, setVistaActual] = useState(() => {
@@ -25,7 +37,6 @@ function App() {
     setVistaActual('login');
   };
 
-
   useEffect(() => {
     setSesionExpiradaCallback(() => {
       setCategoriaSeleccionada(null);
@@ -33,6 +44,15 @@ function App() {
       alert('Tu sesión ha expirado. Por favor, inicia sesión de nuevo.');
     });
   }, []);
+
+  const irAAdmin = () => {
+  const rol = getRolDesdeToken();
+  if (rol === 'admin') {
+    setVistaActual('admin');
+  } else {
+    alert('No tienes permisos para acceder al panel de administración.');
+  }
+};
 
   return (
     <main className={vistaActual === 'login' || vistaActual === 'register' ? "main-layout" : ""}>
@@ -52,7 +72,7 @@ function App() {
             setCategoriaSeleccionada(categoria);
             setVistaActual('articulos');
           }}
-          alIrAdmin={() => setVistaActual('admin')}
+          alIrAdmin={irAAdmin}
         />
       )}
       {vistaActual === 'articulos' && categoriaSeleccionada && (
@@ -62,7 +82,7 @@ function App() {
           alCerrarSesion={cerrarSesion}
         />
       )}
-      {vistaActual === 'admin' && (
+      {vistaActual === 'admin' && getRolDesdeToken() === 'admin' && (
         <AdminDashboard 
           alVolver={() => setVistaActual('dashboard')}
           alCerrarSesion={cerrarSesion}
