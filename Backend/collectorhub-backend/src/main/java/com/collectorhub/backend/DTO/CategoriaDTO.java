@@ -19,8 +19,10 @@ public class CategoriaDTO {
     private String descripcion;
 
     private Integer usuarioId;
+    // Es true si la crea un admin como plantilla oficial
     private Boolean esOficial;
 
+    // Define los campos que tendran los articulos de esta categoria
     @NotEmpty(message = "La categoria debe tener al menos un campo en el esquema")
     private List<Map<String, String>> esquema;
 }

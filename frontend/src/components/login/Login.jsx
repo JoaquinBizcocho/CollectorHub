@@ -1,23 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import './Login.css';
 
+// URL del backend, en produccion coge la variable de entorno
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
+// alIraRegistro y alEntrar son callbacks del componente padre para cambiar de vista
 const Login = ({ alIrARegistro, alEntrar }) => {
   const [alias, setAlias] = useState('');
   const [password, setPassword] = useState('');
   const [mostrarPass, setMostrarPass] = useState(false);
   const [mensaje, setMensaje] = useState('');
   
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem('collectorhub-tema') === 'dark';
-  });
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-    localStorage.setItem('collectorhub-tema', isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode]);
-
+  // Gestiona el submit del formulario, llama al endpoint de login y guarda el token
   const manejarLogin = async (e) => {
     e.preventDefault();
 
@@ -31,11 +26,13 @@ const Login = ({ alIrARegistro, alEntrar }) => {
       if (respuesta.ok) {
         const data = await respuesta.json();
 
+        // Validamos que el token sea un string valido antes de guardarlo
         if (typeof data.token !== 'string' || !data.token) {
           setMensaje("Error: respuesta del servidor inválida.");
           return;
         }
 
+        // Guardamos el token y datos del usuario en localStorage para usarlos en el resto de la app
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuarioId', data.usuarioId);
         localStorage.setItem('alias', alias);
@@ -45,6 +42,7 @@ const Login = ({ alIrARegistro, alEntrar }) => {
 
       } else {
         const texto = await respuesta.text();
+        // Mensaje distintivo degun el codigo de error que devuelva el backend
         if (respuesta.status === 401) {
           setMensaje("Alias o contraseña incorrectos.");
         } else if (respuesta.status === 403) {
@@ -85,6 +83,7 @@ const Login = ({ alIrARegistro, alEntrar }) => {
             onChange={(e) => setPassword(e.target.value)} 
             required
           />
+          {/* Boton par alternar la visibilidad de la contraseña */}
           <button 
             type="button" 
             className="login-toggle-pass"

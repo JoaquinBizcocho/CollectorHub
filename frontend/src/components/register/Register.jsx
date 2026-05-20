@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import './Register.css';
 
+// URL del backen, en produccion la coge de la variable de entorno
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
+// alIrALogin es el callback del padre para volver a la vista de login
 const Register = ({ alIrALogin }) => {
+  // paso 1: formulario registro, paso 2: verificacion PIN
   const [paso, setPaso] = useState(1);
   const [alias, setAlias] = useState('');
   const [correo, setCorreo] = useState('');
@@ -13,18 +16,12 @@ const Register = ({ alIrALogin }) => {
   const [mensaje, setMensaje] = useState('');
   const [cargando, setCargando] = useState(false);
 
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem('collectorhub-tema') === 'dark';
-  });
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-    localStorage.setItem('collectorhub-tema', isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode]);
-
+  // Valida los campos, llama al endpoint de registro y avanza al paso 2 si va bien
   const manejarRegistro = async (e) => {
     e.preventDefault();
 
+    // Validamos la contraseña en el frontend antes de llamar al backend
     const regexPassword = /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
     if (!regexPassword.test(password)) {
       setMensaje("Error: La contraseña debe tener al menos 8 caracteres, un número y un símbolo.");
@@ -51,6 +48,7 @@ const Register = ({ alIrALogin }) => {
 
       if (respuesta.ok) {
         setMensaje("Te hemos enviado un código de 6 dígitos a tu correo.");
+        // Avanzamos al formulario de verificacion del PIN
         setPaso(2);
       } else {
         setMensaje(texto);
@@ -62,6 +60,7 @@ const Register = ({ alIrALogin }) => {
     }
   };
 
+  // Envia el PIN al backend para verificar la cuenta, si va bien redirige al login
   const manejarVerificacion = async (e) => {
     e.preventDefault();
 
@@ -79,6 +78,7 @@ const Register = ({ alIrALogin }) => {
 
       if (respuesta.ok) {
         setMensaje("¡Cuenta verificada con éxito! Redirigiendo al login...");
+        // Esperamos 3 segundos para que el usuario lea el mensaje antes de redirigir
         setTimeout(() => {
           alIrALogin();
         }, 3000);
@@ -94,6 +94,7 @@ const Register = ({ alIrALogin }) => {
 
   return (
     <div className="register-card">
+      {/* El titulo y subtitulo cambian segun el paso en el que este el usuario */}
       <h1 className="register-title">{paso === 1 ? "Crear Cuenta" : "Verifica tu correo"}</h1>
       <p className="register-subtitle">{paso === 1 ? "Únete a CollectorHub" : "Introduce el PIN que hemos enviado a tu email"}</p>
 
@@ -120,6 +121,7 @@ const Register = ({ alIrALogin }) => {
       {paso === 2 && (
         <form onSubmit={manejarVerificacion} className="register-form">
           <div className="register-input-group">
+            {/* Input del PIN con estilo especial para que los digitos se vean separados */}
             <input
               type="text"
               className="register-input"

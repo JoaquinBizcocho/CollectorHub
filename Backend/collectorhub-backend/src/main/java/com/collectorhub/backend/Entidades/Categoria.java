@@ -24,9 +24,11 @@ public class Categoria {
     @Column(name = "usuario_id", nullable = false)
     private Integer usuarioId;
 
+    // Si es true, es una plantilla creada por un admin y la pueden ver todos los usuarios
     @Column(name = "es_oficial", columnDefinition = "boolean default false")
     private Boolean esOficial = false;
 
+    //Define la estructura de campos que tendran los articulos de esta categoria
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
     private List<Map<String, String>> esquema;

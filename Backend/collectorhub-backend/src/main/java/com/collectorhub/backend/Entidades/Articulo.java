@@ -24,10 +24,13 @@ public class Articulo {
     @Column(name = "estado", nullable = false)
     private String estado = "COLECCION";
 
+    // Los datos del articulo se guardan como JSON en la Base de datos permitiendo campos dinamicos
+    // sin necesidad de columnas fijas
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
     private Map<String, Object> datos;
 
+    // las imagenes se guardan como Base64 en LONGTEXT por su tamaño
     @Column(columnDefinition = "LONGTEXT")
     private String imagen1;
 

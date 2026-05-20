@@ -16,14 +16,17 @@ public class CategoriaService {
     @Autowired
     private CategoriaRepository categoriaRepository;
 
+    // Devuelve todas las categorias que pertenecen al usuario
     public List<Categoria> obtenerPorUsuario(Integer usuarioId) {
         return categoriaRepository.findByUsuarioId(usuarioId);
     }
 
+    // Devuelve las plantillas oficiales creadas por un admin, visibles para todos los usuarios
     public List<Categoria> obtenerOficiales() {
         return categoriaRepository.findByEsOficialTrue();
     }
 
+    // Crea una categoria nueva vinculada al usuario, si no viene esOficial en el DTO se pone false por defecto
     public Categoria crearCategoria(CategoriaDTO dto, Integer usuarioId) {
         Categoria categoria = new Categoria();
         categoria.setNombre(dto.getNombre());
@@ -34,6 +37,7 @@ public class CategoriaService {
         return categoriaRepository.save(categoria);
     }
 
+    // Actualiza una categoria existente comprobando que pertenezca al usuario antes de modificarla
     public Categoria actualizarCategoria(Integer id, CategoriaDTO dto, Integer usuarioId) {
         Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Categoria no encontrada"));
@@ -48,6 +52,7 @@ public class CategoriaService {
         return categoriaRepository.save(categoria);
     }
 
+    // Elimina una categoria comprobando que pertenezca al usuario antes de borrarla
     public void eliminarCategoria(Integer id, Integer usuarioId) {
         Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Categoria no encontrada"));

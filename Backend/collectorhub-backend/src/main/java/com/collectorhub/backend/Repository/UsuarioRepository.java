@@ -9,15 +9,11 @@ import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
+    // Busca un usuario por su alias
     Optional<Usuario> findByAlias(String alias);
 
-    boolean existsByAlias(String alias);
-
-    // Para validar correo duplicado
+    // Se usa para validar duplicados en el registro
     Optional<Usuario> findByCorreoElectronico(String correoElectronico);
-
-    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM Usuario u WHERE u.correoElectronico = ?1")
-    boolean comprobarSiExisteCorreo(String correo);
 
     // busca cuentas no verificadas cuyo registro expiró
     @Query("SELECT u FROM Usuario u WHERE u.cuentaActiva = false AND u.fechaRegistro < ?1")

@@ -12,6 +12,7 @@
   transition: all 0.3s ease;
 }
 
+/* Boton del tema oscuro, ya no se usa pero lo dejo por si se reactiva */
 .login-theme-btn {
   position: absolute;
   top: 20px;
@@ -55,11 +56,13 @@
   transition: all 0.3s ease;
 }
 
+/* Resaltamos el input en verde al hacer foco */
 .login-input-group input:focus {
   border-color: #66bb6a;
   box-shadow: 0 0 10px rgba(102, 187, 106, 0.15);
 }
 
+/* Boton del ojo para mostrar/ocultar la contraseña */
 .login-toggle-pass {
   position: absolute;
   right: 15px;
@@ -109,6 +112,7 @@
   margin-left: 5px;
 }
 
+/* Alerta de feedback al usuario, con boton verde a la izquierda */
 .login-alert {
   margin-top: 2rem;
   padding: 20px;
@@ -121,11 +125,7 @@
   text-align: left;
 }
 
-[data-theme="dark"] .login-alert {
-  background-color: #1e3325;
-  color: #e8f5e9;
-}
-
+/* -- Responsive -- */
 
 @media (max-width: 768px) {
   .login-card {

@@ -1,10 +1,12 @@
 package com.collectorhub.backend.Entidades;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usuarios")
+@Data
 public class Usuario {
 
     @Id
@@ -14,56 +16,30 @@ public class Usuario {
     @Column(unique = true, nullable = false)
     private String alias;
 
+    // Guarda la contraseña encriptada con BCrypt
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false, unique = true)
     private String correoElectronico;
 
+    // User o Admin
     private String rol;
 
-
+    // La cuenta no esta activa hasta que el usuario no verifique su correo con el PIN
     @Column(nullable = false)
-    private boolean cuentaActiva = false; // Por defecto es falsa
+    private boolean cuentaActiva = false;
 
+    // Aqui esta el PIN temporal de 6 digitos enviado por correo para activar la cuenta
     @Column(length = 6)
-    private String codigoVerificacion; // Aquí guardamos el PIN temporal
+    private String codigoVerificacion;
 
 
     @Column
     private LocalDateTime fechaRegistro;
 
-
+    // Contador de logins fallidos que se usa para bloquear la cuenta si supera el limite
     @Column(nullable = false)
     private int intentosFallidos = 0;
 
-
-    public Usuario() {}
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getAlias() { return alias; }
-    public void setAlias(String alias) { this.alias = alias; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-
-    public String getCorreoElectronico() { return correoElectronico; }
-    public void setCorreoElectronico(String correoElectronico) { this.correoElectronico = correoElectronico; }
-
-    public String getRol() { return rol; }
-    public void setRol(String rol) { this.rol = rol; }
-
-    public boolean isCuentaActiva() { return cuentaActiva; }
-    public void setCuentaActiva(boolean cuentaActiva) { this.cuentaActiva = cuentaActiva; }
-
-    public String getCodigoVerificacion() { return codigoVerificacion; }
-    public void setCodigoVerificacion(String codigoVerificacion) { this.codigoVerificacion = codigoVerificacion; }
-
-    public LocalDateTime getFechaRegistro() { return fechaRegistro; }
-    public void setFechaRegistro(LocalDateTime fechaRegistro) { this.fechaRegistro = fechaRegistro; }
-
-    public int getIntentosFallidos() { return intentosFallidos; }
-    public void setIntentosFallidos(int intentosFallidos) { this.intentosFallidos = intentosFallidos; }
 }

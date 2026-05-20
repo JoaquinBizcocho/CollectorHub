@@ -4,9 +4,11 @@ import './Articulos.css';
 import '../responsive/Responsive.css'
 import { articulosApi } from '../../services/api';
 
+// Componente que muestra una imagen de previsualización que cambia automáticamente cada 5s si hay 2 imágenes
 const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
   const [indice, setIndice] = useState(0);
   
+  // Filtramos las imágenes nulas o vacías para trabajar solo con las válidas
   const imagenesValidas = [imagen1, imagen2].filter(img => img !== null && img !== "");
 
   useEffect(() => {
@@ -14,6 +16,7 @@ const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
       const temporizador = setInterval(() => {
         setIndice(prev => (prev + 1) % imagenesValidas.length);
       }, 5000);
+      // Limpiamos el intervalo al desmontar
       return () => clearInterval(temporizador);
     }
   }, [imagenesValidas.length]);

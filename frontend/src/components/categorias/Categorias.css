@@ -47,6 +47,7 @@
   gap: 15px;
 }
 
+/* Botón de volver usado en la vista de artículos */
 .btn-volver {
   background-color: transparent;
   color: white;
@@ -133,6 +134,7 @@
   box-sizing: border-box;
 }
 
+/* El hover solo aplica en escritorio, en móvil se desactiva desde Responsive.css */
 .categoria-card-horizontal:hover {
   transform: translateX(5px); 
   box-shadow: 0 8px 25px var(--sombra);
@@ -171,6 +173,7 @@
   background-color: #4caf50;
 }
 
+/* Mensaje cuando no hay categorías creadas */
 .empty-state {
   text-align: center;
   padding: 3rem;
@@ -199,6 +202,7 @@
   transform: translateY(-2px);
 }
 
+/* Variante roja para el botón de borrar */
 .btn-peligro:hover {
   background-color: #ffcdd2; 
   border-color: #ef5350;
@@ -206,6 +210,7 @@
 
 /* ===== MODALES Y FORMULARIOS ===== */
 
+/* Fondo oscuro detrás del modal */
 .modal-overlay {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
   background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);

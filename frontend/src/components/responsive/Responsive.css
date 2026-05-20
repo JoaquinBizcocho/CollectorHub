@@ -1,9 +1,9 @@
 /* src/Responsive.css */
 
-/* ===== MEDIA QUERIES ===== */
+/* ===== Ajuste para pantallas de 768px o menos ===== */
 
 @media (max-width: 768px) {
-  /* 1. Cabecera superior */
+  /* Cabecera superior */
   .dashboard-topbar {
     padding: 15px 20px;
     flex-direction: column;
@@ -11,7 +11,7 @@
     text-align: center;
   }
 
-  /* 2. Contenedor principal y cabecera de sección */
+  /* Contenedor principal y cabecera de sección */
   .dashboard-container {
     padding: 1rem;
   }
@@ -27,7 +27,7 @@
     text-align: center;
   }
 
-  /* 3. Tarjetas de categorías (Pasan de horizontal a vertical) */
+  /* Tarjetas de categorías: Pasan layout horizontal a vertical */
   .categoria-card-horizontal {
     flex-direction: column;
     align-items: flex-start;
@@ -35,6 +35,7 @@
     gap: 15px;
   }
 
+  /* Desactivamos los efectos hover en tactil */
   .categoria-card-horizontal:hover,
   .categoria-card-horizontal:active {
     transform: none !important; 
@@ -53,7 +54,7 @@
     margin-top: 10px;
   }
 
-  /* 4. Tarjetas de Artículos */
+  /* Tarjetas de Artículos: pasan a layout vertical centrado */
   .articulo-card {
     flex-direction: column;
     align-items: center;
@@ -61,12 +62,14 @@
     text-align: center;
   }
 
+  /* Los campos del articulo pasan a una sola columna */
   .articulo-info {
     grid-template-columns: 1fr;
     width: 100%;
     text-align: left;
   }
 
+  /* Los botones de accion del articulo se ponen en fila en movil */
   .articulo-acciones-vertical {
     flex-direction: row;
     width: 100%;
@@ -80,12 +83,13 @@
     min-width: 100px;
   }
 
-  /* 5. Modales y Formularios */
+  /* Modales y Formularios */
   .modal-content {
     padding: 1.5rem;
     width: 95%;
   }
 
+  /* Los campos dinamicos del esquema pasan a una sola columna */
   .campos-dinamicos-grid {
     grid-template-columns: 1fr;
   }
@@ -107,12 +111,12 @@
     width: 100%;
   }
 
-  /* 6. Panel de Administración (Estadísticas) */
+  /* Panel de Administración  */
   .estadisticas-grid {
     grid-template-columns: 1fr !important;
   }
 
-  /* Layout artículos en móvil */
+  /* Layout artículos */
   .articulos-layout {
     flex-direction: column;
     padding: 1rem;
@@ -123,7 +127,7 @@
     position: static;
   }
 
-  /* Dropdown datos */
+  /* el dropdown se abre hacia la derecha en el movil para no salirse de la pantalla */
   .dropdown-menu {
     left: 0;
     right: auto;
@@ -135,7 +139,6 @@
     grid-template-columns: 1fr;
   }
 
-  /* Layout artículos en móvil */
   .articulos-layout {
     flex-direction: column;
     padding: 1rem;
@@ -148,12 +151,12 @@
   }
 
 
-  /* 7. Lightbox flechas */
+  /* Lightbox: flechas mas pegadas al borde en pantallas pequeñas */
   .btn-flecha-lightbox.izq { left: 10px; }
   .btn-flecha-lightbox.der { right: 10px; }
 }
 
-/* Solo aplica el hover si el dispositivo tiene un cursor (ratón) */
+/* Solo aplica el hover si el dispositivo tiene un cursor */
 @media (hover: hover) {
   .categoria-card-horizontal:hover {
     transform: translateX(5px); 

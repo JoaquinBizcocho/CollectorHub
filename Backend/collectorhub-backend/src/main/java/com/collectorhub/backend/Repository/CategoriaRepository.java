@@ -7,8 +7,9 @@ import java.util.List;
 
 @Repository
 public interface CategoriaRepository extends JpaRepository<Categoria, Integer> {
+    // Devuelve todas las categorias de un usuario en concreto
     List<Categoria> findByUsuarioId(Integer usuarioId);
 
-    // Para buscar las plantillas oficiales del Admin
+    // Devuelve las plantillas oficiales creadas por el admin
     List<Categoria> findByEsOficialTrue();
 }
