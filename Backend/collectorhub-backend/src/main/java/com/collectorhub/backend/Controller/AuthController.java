@@ -108,7 +108,9 @@ public class AuthController {
         nuevoUsuario.setIntentosFallidos(0);
 
         //Generamos un PIN de 6 digitos aleatorio y lo guardamos en el usuario
+
         String pin = String.format("%06d", new SecureRandom().nextInt(1000000));
+
         nuevoUsuario.setCodigoVerificacion(pin);
 
         usuarioRepository.save(nuevoUsuario);
@@ -173,12 +175,12 @@ public class AuthController {
 
 
     // Se ejecuta cada minuto buscando usuarios sin verificar cuyo registro tenga mas de 5 min y los elimina de la base de datos.
+
     @Scheduled(fixedRate = 60000)
     public void limpiarCuentasNoVerificadas() {
         LocalDateTime hace5Minutos = LocalDateTime.now().minusMinutes(5);
         List<Usuario> expirados = usuarioRepository
                 .buscarCuentasExpiradas(hace5Minutos);
-
         if (!expirados.isEmpty()) {
             usuarioRepository.deleteAll(expirados);
             System.out.println("Limpieza: eliminados " + expirados.size() + " usuario(s) sin verificar.");
