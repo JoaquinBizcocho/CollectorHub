@@ -4,6 +4,7 @@ import './Admin.css';
 import '../responsive/Responsive.css'
 import { categoriasApi, adminApi } from '../../services/api';
 
+// alVolver y alCerrarSesion son callbacks del padre para cambiar de vista
 const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
   const [estadisticas, setEstadisticas] = useState({ totalUsuarios: 0, totalCategorias: 0, totalArticulos: 0 });
   const [plantillas, setPlantillas] = useState([]);
@@ -18,6 +19,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
     cargarPlantillas();
   }, []);
 
+    // Carga los contadores globales del sistema, solo accesible con token de admin
   const cargarEstadisticas = async () => {
     try {
       setCargandoStats(true);
@@ -31,6 +33,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
     }
   };
 
+    // Carga las plantillas oficiales existentes para mostrarlas en la lista
   const cargarPlantillas = async () => {
     try {
       const response = await categoriasApi.getOficiales();
@@ -40,18 +43,22 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
     }
   };
 
+    // Añade una fila vacía al esquema para definir un nuevo campo
   const agregarCampoEsquema = () => setEsquema([...esquema, { nombre: '', tipo: 'text' }]);
 
+    // Actualiza el nombre o tipo de un campo del esquema por su índice
   const actualizarCampoEsquema = (index, campo, valor) => {
     const nuevoEsquema = [...esquema];
     nuevoEsquema[index][campo] = valor;
     setEsquema(nuevoEsquema);
   };
 
+    // Elimina un campo del esquema por su índice
   const eliminarCampoEsquema = (index) => {
     setEsquema(esquema.filter((_, i) => i !== index));
   };
 
+    // Borra una plantilla oficial con confirmación previa
   const borrarPlantilla = async (id) => {
     if (window.confirm("¿Borrar esta plantilla oficial?")) {
       try {
@@ -63,14 +70,17 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
     }
   };
 
+    // Crea una plantilla oficial nueva con esOficial a true para que sea visible para todos los usuarios
   const guardarPlantilla = async (e) => {
     e.preventDefault();
+     // Filtramos campos sin nombre antes de guardar
     const esquemaLimpio = esquema.filter(campo => campo.nombre.trim() !== '');
     const nuevaPlantilla = { nombre, descripcion, esquema: esquemaLimpio, esOficial: true };
     try {
       const response = await categoriasApi.crear(nuevaPlantilla);
       if (response.ok) {
         cargarPlantillas();
+        // Actualizamos las métricas porque se ha creado una nueva categoría
         cargarEstadisticas();
         setMostrarModal(false);
         setNombre('');
@@ -94,6 +104,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
 
       <div className="dashboard-container">
         <h3 className="section-title" style={{ marginTop: '0', marginBottom: '20px' }}>Métricas Globales</h3>
+        {/* Mientras cargan los datos mostramos "..." con el efecto de parpadeo */}
         <div className="estadisticas-grid">
           <div className="estadistica-card">
             <h3>Usuarios Registrados</h3>
@@ -141,6 +152,7 @@ const AdminDashboard = ({ alVolver, alCerrarSesion }) => {
           )}
         </div>
 
+        {/* Modal para crear una nueva plantilla oficial */}
         {mostrarModal && (
           <div className="modal-overlay">
             <div className="modal-content">

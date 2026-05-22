@@ -7,7 +7,7 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import { setSesionExpiradaCallback } from './services/api';
 import "./App.css"
 
-// Lee el rol directamente del JWT sin fiarse del localStorage
+// Decodifica el JWT para sacar el rol sin fiarse del localStorage, que podría estar manipulado
 const getRolDesdeToken = () => {
   try {
     const token = localStorage.getItem('token');
@@ -21,6 +21,7 @@ const getRolDesdeToken = () => {
 
 function App() {
 
+    // Si ya hay sesión guardada arrancamos directamente en el dashboard en vez del login
   const [vistaActual, setVistaActual] = useState(() => {
     const usuarioGuardado = localStorage.getItem('usuarioId');
     return usuarioGuardado ? 'dashboard' : 'login';
@@ -28,6 +29,7 @@ function App() {
 
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
 
+    // Limpia el localStorage y vuelve al login
   const cerrarSesion = () => {
     localStorage.removeItem('usuarioId');
     localStorage.removeItem('alias');
@@ -36,6 +38,7 @@ function App() {
     setVistaActual('login');
   };
 
+    // Registramos el callback de sesión expirada para que api.js pueda redirigir al login cuando el token caduca
   useEffect(() => {
     setSesionExpiradaCallback(() => {
       setCategoriaSeleccionada(null);
@@ -44,6 +47,7 @@ function App() {
     });
   }, []);
 
+    // Verifica el rol desde el token antes de dejar entrar al panel de admin
   const irAAdmin = () => {
   const rol = getRolDesdeToken();
   if (rol === 'admin') {
@@ -54,6 +58,7 @@ function App() {
 };
 
   return (
+        // El main-layout solo aplica en login y registro para centrar la tarjeta en pantalla
     <main className={vistaActual === 'login' || vistaActual === 'register' ? "main-layout" : ""}>
       {vistaActual === 'login' && (
         <Login 
@@ -81,6 +86,7 @@ function App() {
           alCerrarSesion={cerrarSesion}
         />
       )}
+            {/* Doble comprobación del rol para que nadie pueda llegar a la vista admin sin serlo */}
       {vistaActual === 'admin' && getRolDesdeToken() === 'admin' && (
         <AdminDashboard 
           alVolver={() => setVistaActual('dashboard')}

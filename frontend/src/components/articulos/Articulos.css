@@ -16,6 +16,7 @@
   gap: 20px;
 }
 
+/* Grid adaptable que ajusta las columnas según el espacio disponible */
 .articulo-info {
   overflow: hidden;
   min-width: 0;
@@ -39,6 +40,7 @@
   gap: 2px;
 }
 
+/* La etiqueta del campo se trunca con ellipsis si es muy larga */
 .dato-etiqueta {
   font-weight: bold;
   color: #66bb6a;
@@ -56,6 +58,7 @@
   font-size: 1rem;
 }
 
+/* Columna de botones de acción a la derecha de la tarjeta */
 .articulo-acciones-vertical {
   display: flex;
   flex-direction: column;
@@ -81,6 +84,7 @@
   background-color: #e0e0e0;
 }
 
+/* Variante roja para el botón de eliminar */
 .btn-icon-text.peligro:hover {
   background-color: #ffcdd2;
   color: #d32f2f;
@@ -89,6 +93,7 @@
 
 /* ===== IMÁGENES DE ARTÍCULOS ===== */
 
+/* Contenedor cuadrado fijo para la miniatura del artículo */
 .articulo-imagen-container {
   width: 150px;
   height: 150px;
@@ -108,6 +113,7 @@
   object-fit: cover;
 }
 
+/* Al hacer hover la imagen se escala ligeramente para indicar que es clicable */
 .articulo-imagen-preview.clickable {
   cursor: pointer;
   transition: transform 0.2s ease; 
@@ -125,6 +131,7 @@
 
 /* ===== FORMULARIO DE ARTÍCULO: CAMPOS DINÁMICOS E IMÁGENES ===== */
 
+/* Dos columnas para los campos del esquema en el modal */
 .campos-dinamicos-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -138,6 +145,7 @@
   overflow: hidden;
 }
 
+/* El label se trunca si el nombre del campo es muy largo */
 .campo-dinamico label {
   display: block;
   margin-bottom: 5px;
@@ -149,6 +157,7 @@
   max-width: 100%;
 }
 
+/* Zona de imágenes con soporte para drag & drop y pegado */
 .zona-imagenes {
   background-color: var(--bg-input);
   padding: 15px;
@@ -161,6 +170,7 @@
   outline: 2px solid #66bb6a;
 }
 
+/* Cambia el fondo y el borde mientras se arrastra un archivo encima */
 .zona-imagenes.arrastrando {
   background-color: rgba(102, 187, 106, 0.15);
   border-color: #4caf50;
@@ -201,6 +211,7 @@
   transform: translateY(-2px);
 }
 
+/* Deshabilitado cuando ya hay 2 imágenes subidas */
 .btn-subir-imagen.disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -247,6 +258,7 @@
   object-fit: cover;
 }
 
+/* Botón X para quitar una imagen, posicionado en la esquina superior derecha de la miniatura */
 .btn-quitar-img {
   position: absolute;
   top: 0;
@@ -262,6 +274,7 @@
 
 /* ===== LIGHTBOX ===== */
 
+/* Fondo oscuro con blur que cubre toda la pantalla al ver una imagen ampliada */
 .lightbox-overlay {
   position: fixed;
   top: 0;
@@ -287,6 +300,7 @@
   align-items: center;
 }
 
+/* La imagen se adapta al viewport sin recortarse */
 .lightbox-img {
   max-width: 100%;
   max-height: 90vh; 
@@ -295,6 +309,7 @@
   box-shadow: 0 10px 40px rgba(0,0,0,0.5);
 }
 
+/* Botón de cierre encima de la imagen */
 .btn-close-lightbox {
   position: absolute;
   top: -40px; 
@@ -324,6 +339,7 @@
   to { opacity: 1; }
 }
 
+/* Flechas de navegación del lightbox, posicionadas a los lados de la imagen */
 .btn-flecha-lightbox {
   position: absolute;
   top: 50%;
@@ -395,6 +411,7 @@
   border-color: #66bb6a;
 }
 
+/* Botón para alternar entre ascendente y descendente */
 .btn-orden-direccion {
   padding: 8px 14px;
   border: 1px solid #66bb6a;
@@ -438,6 +455,7 @@
   color: #66bb6a;
 }
 
+/* Pestaña colección activa en verde */
 .btn-pestana.activa {
   background-color: #66bb6a;
   border-color: #66bb6a;
@@ -457,6 +475,7 @@
 
 /* ===== LAYOUT DOS COLUMNAS ===== */
 
+/* Contenido principal a la izquierda, sidebar de estadísticas a la derecha */
 .articulos-layout {
   display: flex;
   gap: 2rem;
@@ -471,6 +490,7 @@
   min-width: 0;
 }
 
+/* El sidebar se queda fijo mientras se hace scroll por los artículos */
 .articulos-sidebar {
   width: 260px;
   flex-shrink: 0;
@@ -500,6 +520,7 @@
   border-bottom: 1px solid var(--borde-input);
 }
 
+/* La última sección no lleva borde inferior */
 .stats-seccion:last-child {
   border-bottom: none;
   margin-bottom: 0;
@@ -522,6 +543,7 @@
   margin-bottom: 0.6rem;
 }
 
+/* El label se trunca si el nombre del campo es muy largo */
 .stats-label {
   font-size: 0.9rem;
   color: var(--texto-input);
@@ -538,6 +560,7 @@
   color: #66bb6a;
 }
 
+/* El contador de wishlist se muestra en amarillo para diferenciarlo */
 .stats-valor-wishlist {
   color: #ffb300;
 }
@@ -560,6 +583,7 @@
   color: #66bb6a;
 }
 
+/* Botón para alternar entre suma y media de un campo numérico */
 .btn-toggle-modo {
   background: transparent;
   border: 1px solid #66bb6a;
@@ -614,6 +638,7 @@
   position: relative;
 }
 
+/* Menú desplegable con las opciones de exportar e importar */
 .dropdown-menu {
   position: absolute;
   top: calc(100% + 8px);
@@ -649,6 +674,7 @@
   color: #66bb6a;
 }
 
+/* Separador visual entre las opciones de exportar e importar */
 .dropdown-divider {
   height: 1px;
   background-color: var(--borde-input);

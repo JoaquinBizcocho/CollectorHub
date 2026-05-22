@@ -34,14 +34,17 @@ const CarruselMiniatura = ({ imagen1, imagen2, alHacerClic }) => {
   );
 };
 
+// formatea el valor de un campo segun su tipo para mostrarlo en la tarjeta del articulo
 const formatearValor = (campo, valor) => {
   if (campo.tipo === 'boolean') return valor === true || valor === 'true' ? 'Si' : 'No';
   if (campo.tipo === 'date') return new Date(valor + 'T00:00:00').toLocaleDateString('es-ES');
   return valor;
 };
 
+// Los datos del articulo se guardan con claves como campo_0, campo_1, etc.
 const claveIndice = (index) => `campo_${index}`;
 
+// Convierte los datos guardados del articulo al formato que espera el formulario
 const datosAFormulario = (esquema, datos) => {
   const formulario = {};
   esquema.forEach((_, index) => {
@@ -51,6 +54,7 @@ const datosAFormulario = (esquema, datos) => {
   return formulario;
 };
 
+// Convierte los valores del formulario al formato que se envia al backend
 const formularioADatos = (esquema, formulario) => {
   const datos = {};
   esquema.forEach((_, index) => {
@@ -60,6 +64,7 @@ const formularioADatos = (esquema, formulario) => {
   return datos;
 };
 
+// Ordena la lista de articulos por el campo y direccion seleccionados respetando el tipo del dato
 const ordenarArticulos = (articulos, esquema, campoIndex, direccion) => {
   if (campoIndex === null || !esquema?.[campoIndex]) return articulos;
   const campo = esquema[campoIndex];
@@ -67,6 +72,7 @@ const ordenarArticulos = (articulos, esquema, campoIndex, direccion) => {
   return [...articulos].sort((a, b) => {
     const valA = a.datos?.[clave] ?? '';
     const valB = b.datos?.[clave] ?? '';
+    // Los valores vacios siempre van al final
     if (valA === '' && valB !== '') return 1;
     if (valB === '' && valA !== '') return -1;
     if (valA === '' && valB === '') return 0;
@@ -86,6 +92,7 @@ const ordenarArticulos = (articulos, esquema, campoIndex, direccion) => {
   });
 };
 
+// Devuelve la etiqueta del boton de direccion segun el tipo del campo
 const etiquetaDireccion = (tipo, direccion) => {
   if (tipo === 'number') return direccion === 'asc' ? '↑ Menor' : '↓ Mayor';
   if (tipo === 'boolean') return direccion === 'asc' ? '↑ Sí' : '↓ No';
@@ -94,12 +101,15 @@ const etiquetaDireccion = (tipo, direccion) => {
 };
 
 // ===== PANEL DE ESTADÍSTICAS =====
+// Muestra contadores y calculos sobre los articulos de la coleccion activa
 const PanelEstadisticas = ({ articulos, esquema }) => {
+  // modoNumerico guarda si cada campo numerico muestra suma o media
   const [modoNumerico, setModoNumerico] = useState({});
 
   const coleccion = articulos.filter(a => a.estado === 'COLECCION');
   const wishlist = articulos.filter(a => a.estado === 'WISHLIST');
 
+  // Sacamos solo los campos numericos y booleanos del esquema para mostrar las estadisticas
   const camposNumericos = (esquema || [])
     .map((campo, idx) => ({ ...campo, idx }))
     .filter(c => c.tipo === 'number');
@@ -108,6 +118,7 @@ const PanelEstadisticas = ({ articulos, esquema }) => {
     .map((campo, idx) => ({ ...campo, idx }))
     .filter(c => c.tipo === 'boolean');
 
+    // Calcula la suma o media de un campo numerico sobre los articulos de la coleccion
   const calcularNumerico = (campo) => {
     const clave = claveIndice(campo.idx);
     const valores = coleccion
@@ -121,6 +132,7 @@ const PanelEstadisticas = ({ articulos, esquema }) => {
     return (valores.reduce((a, b) => a + b, 0) / valores.length).toLocaleString('es-ES', { maximumFractionDigits: 2 });
   };
 
+  // Alterna entre suma y media para un campo numerico en concreto
   const toggleModo = (idx) => {
     setModoNumerico(prev => ({
       ...prev,
@@ -150,6 +162,7 @@ const PanelEstadisticas = ({ articulos, esquema }) => {
             <div key={campo.idx} className="stats-numerico">
               <div className="stats-numerico-header">
                 <span className="stats-label">{campo.nombre}</span>
+                {/* Boton para alternar entre suma o media del campo */}
                 <button
                   className="btn-toggle-modo"
                   onClick={() => toggleModo(campo.idx)}
@@ -169,6 +182,7 @@ const PanelEstadisticas = ({ articulos, esquema }) => {
           <p className="stats-subtitulo">Campos Sí / No (Mi Collecion)</p>
           {camposBooleanos.map(campo => {
             const clave = claveIndice(campo.idx);
+            // Contamos cuantos articulos tienen en el campo con true y con false
             const si = coleccion.filter(a => a.datos?.[clave] === true || a.datos?.[clave] === 'true').length;
             const no = coleccion.filter(a => a.datos?.[clave] === false || a.datos?.[clave] === 'false').length;
             return (
@@ -191,15 +205,17 @@ const PanelEstadisticas = ({ articulos, esquema }) => {
   );
 };
 
+// Vista principal de articulos de una categoria concreta
+// alVolver y alCerrarSesion son callbacks del padre para cambiar de vista
 const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
   const [articulos, setArticulos] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
-  const [idEditando, setIdEditando] = useState(null);
+  const [idEditando, setIdEditando] = useState(null); // null = creando, numero = editando ese articulo
   const [datosFormulario, setDatosFormulario] = useState({});
   const [imagenes, setImagenes] = useState([]);
-  const [arrastrando, setArrastrando] = useState(false);
-  const [pestanaActiva, setPestanaActiva] = useState('COLECCION');
-  const [menuDatosAbierto, setMenuDatosAbierto] = useState(false);
+  const [arrastrando, setArrastrando] = useState(false); // estado visual del arrastrar una imagen
+  const [pestanaActiva, setPestanaActiva] = useState('COLECCION');  // Coleccion o wishlist
+  const [menuDatosAbierto, setMenuDatosAbierto] = useState(false);  // Dropdown de exportar/importar
 
   const [ordenCampoIndex, setOrdenCampoIndex] = useState(null);
   const [ordenDireccion, setOrdenDireccion] = useState('asc');
@@ -210,13 +226,14 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     indiceActual: 0 
   });
 
+  // Reseteamos el orden al cambiar de categoria
   useEffect(() => { cargarArticulos(); }, [categoria]);
   useEffect(() => {
     setOrdenCampoIndex(null);
     setOrdenDireccion('asc');
   }, [categoria]);
 
-  // Cerrar dropdown al hacer clic fuera
+  // Cerramos el dropdown de datos al hacer click fuera de el
   useEffect(() => {
     const cerrar = (e) => {
       if (!e.target.closest('.dropdown-wrapper')) setMenuDatosAbierto(false);
@@ -225,6 +242,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     return () => document.removeEventListener('mousedown', cerrar);
   }, []);
 
+  // Carga los articulos de la categoria actual
   const cargarArticulos = async () => {
     try {
       const response = await articulosApi.getByCategoria(categoria.id);
@@ -234,10 +252,12 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     }
   };
 
+  // Abre el lightbox con la lista de imagenes del articulo clicado
   const abrirLightbox = (imagenesLista, indexClicado) => {
     setLightbox({ activo: true, listaImagenes: imagenesLista, indiceActual: indexClicado });
   };
   const cerrarLightbox = () => setLightbox({ ...lightbox, activo: false });
+  //Navega por las imagenes del lightbox con modulo para hacer bucle
   const fotoSiguiente = (e) => {
     e.stopPropagation();
     setLightbox(prev => ({ ...prev, indiceActual: (prev.indiceActual + 1) % prev.listaImagenes.length }));
@@ -251,6 +271,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     setDatosFormulario(prev => ({ ...prev, [clave]: valor }));
   };
 
+  // Convierte los archivos de imagen a Base64 y los añade al estado, maximo 2
   const procesarArchivos = (archivos) => {
     if (imagenes.length + archivos.length > 2) {
       alert("Solo puedes subir un maximo de 2 imagenes por articulo.");
@@ -266,9 +287,12 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
   const manejarSubidaImagen = (e) => procesarArchivos(Array.from(e.target.files));
   const manejarDrop = (e) => {
     e.preventDefault(); e.stopPropagation(); setArrastrando(false);
+    // Filtramos para aceptar solo archivos de imagen en el drop
     const archivos = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
     procesarArchivos(archivos);
   };
+
+  // Permite pegar imagenes directamente desde el portapapeles
   const manejarPegado = (e) => {
     const items = e.clipboardData?.items;
     if (!items) return;
@@ -278,6 +302,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
   };
   const quitarImagen = (index) => setImagenes(imagenes.filter((_, i) => i !== index));
 
+  // Abre el modal de creacion limpiando el formulario
   const abrirNuevoArticulo = () => {
     setIdEditando(null);
     setDatosFormulario(datosAFormulario(categoria.esquema || [], {}));
@@ -285,6 +310,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     setMostrarModal(true);
   };
 
+    // Abre el modal de edicion cargando los datos del articulo seleccionado
   const abrirEdicion = (art) => {
     setIdEditando(art.id);
     setDatosFormulario(datosAFormulario(categoria.esquema || [], art.datos || {}));
@@ -295,6 +321,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     setMostrarModal(true);
   };
 
+  // Borra un articulo con confirmacion previa
   const borrarArticulo = async (id) => {
     if (window.confirm("¿Estás seguro de que quieres borrar este artículo?")) {
       try {
@@ -312,8 +339,10 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     }
   };
 
+  // Valida que todos los campos esten rellenos y guarda o actualiza el articulo
   const guardarArticulo = async (e) => {
     e.preventDefault();
+    // Recorremos el esquema para detectar campos obligatorios vacios
     const camposFaltantes = [];
     if (categoria.esquema) {
       categoria.esquema.forEach((campo, index) => {
@@ -330,6 +359,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     }
     const articuloGuardar = {
       categoriaId: categoria.id,
+      // Si estamos editando mantenemos el estado original, si es nuevo usamos la pestaña activa
       estado: idEditando ? (articulos.find(a => a.id === idEditando)?.estado || pestanaActiva) : pestanaActiva,
       datos: formularioADatos(categoria.esquema || [], datosFormulario),
       imagen1: imagenes[0] || null,
@@ -351,6 +381,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     }
   };
 
+  // Descarga los articulos de la categoria en el formato indicado (CSV o JSON)
   const descargarArchivo = async (tipo) => {
     const response = tipo === 'csv'
       ? await articulosApi.exportarCsv(categoria.id)
@@ -364,6 +395,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     URL.revokeObjectURL(url);
   };
 
+  // Abre un selector de archivo y gestiona la importacion con logica de conflictos
   const importarArchivo = async (tipo) => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -373,15 +405,18 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
       if (!archivo) return;
       const contenido = await archivo.text();
       try {
+        // Primera llamada con sobreescribir = false para detectar conflictos
         const response = tipo === 'csv'
           ? await articulosApi.importarCsv(categoria.id, contenido, false)
           : await articulosApi.importarJson(categoria.id, contenido, false);
         const data = await response.json();
         if (data.requiereConfirmacion) {
+          // Si hay conflictos preguntamos al usuario si quiere sobreescribir
           const confirmar = window.confirm(
             `${data.conflictos} artículo(s) del fichero ya existen en esta categoría.\n\n¿Quieres sobreescribirlos con los datos del fichero?`
           );
           if (confirmar) {
+            // Segunda llamada con el sobreescribir = true si el usuario confirma
             const response2 = tipo === 'csv'
               ? await articulosApi.importarCsv(categoria.id, contenido, true)
               : await articulosApi.importarJson(categoria.id, contenido, true);
@@ -402,6 +437,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
     input.click();
   };
 
+  // Aplicamos el orden seleccionado y filtramos por la pestaña activa
   const articulosOrdenados = ordenarArticulos(articulos, categoria.esquema, ordenCampoIndex, ordenDireccion);
   const articulosFiltrados = articulosOrdenados.filter(a => a.estado === pestanaActiva);
   const campoOrdenActual = ordenCampoIndex !== null ? categoria.esquema?.[ordenCampoIndex] : null;
@@ -433,6 +469,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
               </div>
             </div>
             <div className="topbar-actions">
+              {/* Dropdown con las opciones de exportar e importar CSV/JSON */}
               <div className="dropdown-wrapper">
                 <button
                   className="btn-nueva-categoria"
@@ -462,6 +499,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
             </div>
           </div>
 
+           {/* Barra de ordenación, solo se muestra si hay articulos y la categoria tiene esquema */}  
           {articulosFiltrados.length > 0 && categoria.esquema?.length > 0 && (
             <div className="orden-barra">
               <span className="orden-label">Ordenar por:</span>
@@ -480,6 +518,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                     <option key={idx} value={idx}>{campo.nombre}</option>
                   ))}
                 </select>
+                 {/* El botón de direccion solo aparece cuando hay un campo seleccionado */}
                 {ordenCampoIndex !== null && (
                   <>
                     <div className="orden-divisor" />
@@ -518,6 +557,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                       </div>
                     )}
                     <div className="articulo-info">
+                       {/* Renderizamos los campos del articulo segun el esquema de su categoria */}
                       {categoria.esquema && categoria.esquema.map((campo, idx) => {
                         const clave = claveIndice(idx);
                         const valor = art.datos?.[clave];
@@ -544,16 +584,19 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
           </div>
         </div>
 
+        {/* Sidebar con estadisticas de la coleccion */}
         <aside className="articulos-sidebar">
           <PanelEstadisticas articulos={articulos} esquema={categoria.esquema} />
         </aside>
       </div>
 
+      {/* Modal para crear o editar un artículo */}
       {mostrarModal && (
         <div className="modal-overlay">
           <div className="modal-content modal-largo">
             <h3>{idEditando ? 'Editar Articulo' : 'Añadir Articulo'}</h3>
             <form onSubmit={guardarArticulo}>
+               {/* Generamos los inputs dinámicamente segun el esquema de la categoria */}
               <div className="campos-dinamicos-grid">
                 {categoria.esquema && categoria.esquema.map((campo, index) => {
                   const clave = claveIndice(index);
@@ -585,6 +628,7 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
                 })}
               </div>
 
+              {/* Zona de imagenes con soporte para drag & drop, pegado y selección de archivo */}
               <div
                 className={`zona-imagenes ${arrastrando ? 'arrastrando' : ''}`}
                 onDrop={manejarDrop}
@@ -617,8 +661,10 @@ const ArticulosView = ({ categoria, alVolver, alCerrarSesion }) => {
         </div>
       )}
 
+      {/* Lightbox para ver las imágenes a pantalla completa con navegación */}
       {lightbox.activo && (
         <div className="lightbox-overlay" onClick={cerrarLightbox}>
+           {/* stopPropagation para que el clic dentro no cierre el lightbox */}
           <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
             <button className="btn-close-lightbox" onClick={cerrarLightbox}>X</button>
             {lightbox.listaImagenes.length > 1 && (
